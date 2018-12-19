@@ -33,13 +33,14 @@ public class ShortestPathAlgo {
 		Iterator<Fruit> it= getGame().getFruits().iterator();
 
 		int size=getGame().getPackmans().size();
-		double close[][]= new double[4][size];//0-packman, 1- fruit, 2- time, 3- grade
+		double close[][]= new double[4][size];//0-min time, 1- fruit, 2- time, 3- grade
 		close[0][0]=-1;
+		boolean in=true;
 
 		while(it.hasNext()) {
 			for(int i=0; i<size; i++) {
 				Packman p= getGame().getPackmans().get(i);
-				if(close[0][i]==-2||close[0][0]==-1) {
+				if(in||close[0][i]==-2) {
 					for(int j=0; j<getGame().getFruits().size();j++) {
 						Fruit f= getGame().getFruits().get(j);
 						double dis=(p.getLocationGPS().distance3d(f.getLocationGPS())-p.getDataP().getRadius());
@@ -57,16 +58,30 @@ public class ShortestPathAlgo {
 							close[1][i]=j;
 						}
 					}
+					if(i==size-1) {
+						in=false;
+					}
 				}
 			}
 			double min= close[0][0];
 			int f=(int) close[1][0];
 			int p=0;
-			for(int i=0; i<size; i++) {
+			for(int i=1; i<size; i++) {
+				
 				if(min>close[0][i] ){
 					min=close[0][i];
 					f=(int) close[1][i];
 					p=i;
+				}
+				if(f==close[1][i]) {
+					if(close[2][i]<close[2][p]) {
+						close[0][p]=-2;
+						p=i;
+						f=(int) close[1][i];
+					}
+					else {
+						close[0][i]=-2;
+					}
 				}
 			}
 			for(int i=0; i<size; i++) {
@@ -80,9 +95,7 @@ public class ShortestPathAlgo {
 					}
 				}
 
-				if(f==close[1][i] ){
-					close[0][i]=-2;
-				}
+			
 				if(close[1][i]>f) {
 					close[1][i]--;
 				}
