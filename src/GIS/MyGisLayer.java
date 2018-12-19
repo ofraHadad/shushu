@@ -26,10 +26,11 @@ public class MyGisLayer implements GIS_layer {
 	public int whatAmI() {
 		return (getLayer().get(0).whatAmI()) ;
 	}
+	
 	@Override
 	public boolean add(GIS_element arg0) {
 
-		if(getLayer().contains(arg0)) {
+		if(contains(arg0)) {
 			return false;
 		}
 		return layer.add(arg0);
@@ -57,11 +58,13 @@ public class MyGisLayer implements GIS_layer {
 
 	@Override
 	public boolean contains(Object arg0) {
-		MyGisElement arg= (MyGisElement)arg0;
+		GIS_element arg= (GIS_element) arg0;
 		Iterator<GIS_element> it= this.iterator();
 		while(it.hasNext()) {
-			arg.equals(it.next());
-			return true;
+			if( arg.equals(it.next())) {
+				return true;
+			}
+			
 		}
 		return false;
 	}
@@ -145,13 +148,16 @@ public class MyGisLayer implements GIS_layer {
 			return "empty";
 
 		}
-		String ans="Meta Data: "+ get_Meta_data()+"";
+		String ans="Meta Data: "+ get_Meta_data()+"\n";
 		while(it.hasNext()) {
 			ans= ans+it.next()+"\n";
 		}
 		return ans;
 	}
-
+	
+	public GIS_element get(int i) {
+		return layer.get(i);
+	}
 
 
 	/////////////////////////////////////private//////////////////////////////////////////////////////////
@@ -170,6 +176,8 @@ public class MyGisLayer implements GIS_layer {
 		}
 		return true;
 	}
+	
+
 
 
 	//////////////////////////getters and setters////////////////////////

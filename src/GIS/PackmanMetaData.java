@@ -1,5 +1,8 @@
 package GIS;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import Geom.Point3D;
 
 public class PackmanMetaData implements Meta_data{
@@ -8,6 +11,9 @@ public class PackmanMetaData implements Meta_data{
 	private int speed;
 	private int radius;
 	private int grade=0;
+	private ArrayList<Fruit> eat= new ArrayList<Fruit>();
+	private double time;
+	private double timeNext;
 
 	public PackmanMetaData(int id) {
 		setId(id);
@@ -59,18 +65,30 @@ public class PackmanMetaData implements Meta_data{
 		setRadius(data.getRadius());
 		setSpeed(data.getSpeed());
 		setGrade(data.grade);
+		Iterator<Fruit> it=data.getEat().iterator();
+		while(it.hasNext()) {
+			getEat().add(it.next());
+		}
+		setTime(data.getTime());
+		setTimeNext(data.getTimeNext());
 	}
 
 	
 
 	public String toString() {
-		return "Alt: "+getAlt()+ ", Speed: "+ getSpeed()+", Radius: "+ getRadius()+", id: "+ getId()+", Grade:"+getGrade();
+		String ans="";
+		Iterator <Fruit> it= getEat().iterator();
+		while(it.hasNext()) {
+			ans= ans+it.next().getDataF().getId()+",";
+		}
+		return "Alt: "+getAlt()+", Weight/Grade: "+getGrade()+", Id: "+ getId()+", Time: "+getTimeNext()+", Start: "+getTime()+";"+
+				", Speed: "+ getSpeed()+", Radius: "+ getRadius()+", ate: "+ans;
 	}
 
 	@Override
 	public long getUTC() {
 		// TODO Auto-generated method stub
-		return 0;
+		return (long) (getTimeNext()*1000);
 	}
 
 	@Override
@@ -90,6 +108,11 @@ public class PackmanMetaData implements Meta_data{
 
 
 		return index;
+	}
+	
+	public boolean equals(Meta_data e) {
+		return (getUTC()==e.getUTC())&&(toString().substring(toString().indexOf("Id: ")+4, toString().indexOf(", Time:")))
+				.equals(e.toString().substring(e.toString().indexOf("Id: ")+4, e.toString().indexOf(", Time:")));
 	}
 
 	public int getId() {
@@ -130,6 +153,28 @@ public class PackmanMetaData implements Meta_data{
 	public int getGrade() {
 		return grade;
 	}
+	public double getTime() {
+		return time;
+	}
 
+	public void setTime(double time) {
+		this.time = time;
+	}
+
+	public ArrayList<Fruit> getEat() {
+		return eat;
+	}
+
+
+	public double getTimeNext() {
+		return timeNext;
+	}
+
+
+
+	public void setTimeNext(double timeNext) {
+		this.timeNext = timeNext;
+	}
+	
 
 }

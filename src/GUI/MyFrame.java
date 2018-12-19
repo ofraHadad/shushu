@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,12 +19,12 @@ import File_format.CsvToKml;
 import File_format.DirectoryToKml;
 import GIS.Fruit;
 import GIS.GIS_layer;
-import GIS.Game;
 import GIS.MyGisLayer;
 import GIS.MyGisProject;
 import GIS.Packman;
 import GIS.Path;
 import GIS.ProjectMetaData;
+import game.Game;
 import game.Map;
 import game.ShortestPathAlgo;
 
@@ -32,9 +33,9 @@ import game.ShortestPathAlgo;
  *
  * @author annaf
  */
-public class MyFrame extends JFrame implements MouseListener {
+public class MyFrame extends JFrame implements MouseListener{
 
-	public Map map=new Map();
+	public Map map;
 	private Container window;
 	private JPanel _panel;
 	private Graphics _paper;
@@ -47,13 +48,14 @@ public class MyFrame extends JFrame implements MouseListener {
 	private int pathNum=1;
 	private boolean isRun;
 
-	public MyFrame(){
+	public MyFrame(Map map){
 		super("Map Demo"); //setTitle("Map Counter");  // "super" Frame sets its title
 		//	Moves and resizes this component. 
 		//	The new location of the top-left corner is  specified by x and y, 
 		//	and the new size is specified by width and height
 		//	setBounds(x,y,width,height)
-		this.setBounds(0,0,1433,700); //setSize(1433,700);        // "super" Frame sets its initial window size
+		setMap(map);
+		this.setBounds(0,0,getMap().getMyImage().getWidth(),getMap().getMyImage().getHeight()); //setSize(1433,700);        // "super" Frame sets its initial window size
 		//      Exit the program when the close-window button clicked
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
@@ -70,7 +72,7 @@ public class MyFrame extends JFrame implements MouseListener {
 
 		//Add "panel" to be used for drawing            
 		_panel = new JPanel();
-		Dimension d= new Dimension(1433,642);
+		Dimension d= new Dimension(map.getMyImage().getWidth(),map.getMyImage().getHeight());
 		_panel.setPreferredSize(d);		               
 		window.add(_panel);
 
@@ -79,6 +81,7 @@ public class MyFrame extends JFrame implements MouseListener {
 		Menu menu, data, menu2;         // each menu in the menu-bar
 		MenuItem fruit,run, packman,save,saveKML; // an item in a menu
 		menuBar = new MenuBar();
+
 		data=new Menu("data");
 		menuBar.add(data);
 		Iterator<String> it=read("data").iterator();
@@ -99,14 +102,31 @@ public class MyFrame extends JFrame implements MouseListener {
 				}
 			});
 		}
-		
-		
+
+
 		// First Menu
 		menu = new Menu("Play");
 		//menu.setMnemonic(KeyEvent.VK_A);  // alt short-cut key
 		menuBar.add(menu);  // the menu-bar adds this menu
-		
-		
+
+
+		save= new MenuItem("Save game");
+		menu.add(save);
+		save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isGamer=5;
+				SimpleJButton(data);
+
+
+			}
+		});
+
+
+
+
+
 		menu2= new Menu("Run");
 		menuBar.add(menu2);
 		run= new MenuItem("Run");
@@ -125,18 +145,13 @@ public class MyFrame extends JFrame implements MouseListener {
 		saveKML= new MenuItem("Save path");
 		menu2.add(saveKML);
 		saveKML.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				isGamer=6;
-				DirectoryToKml d= new DirectoryToKml();
-				if(isRun==true) {
-				d.multyKmlFile(getPath(), "Path_"+pathNum++);
-				}
-				else {
-					System.out.println("please enter Run befor");
-				}
+
+				SimpleJButton(menu2);
+
 			}
 		});
 		fruit = new MenuItem("fruit");
@@ -155,22 +170,9 @@ public class MyFrame extends JFrame implements MouseListener {
 				isGamer = 2;
 			}
 		}); 
-		
-		save= new MenuItem("Save game");
-		menu.add(save);
-		save.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-	
-				isGamer=5;
 
-				CSVWriter c= new CSVWriter();
-				c.gameToCSV("game"+gameNum++,game);
-				
-			}
-		});
-		
+
+
 
 		setMenuBar(menuBar);  // "this" JFrame sets its menu-bar
 		JLabel labelMap = new JLabel();
@@ -181,7 +183,7 @@ public class MyFrame extends JFrame implements MouseListener {
 		//panel adds "this" object as a MouseEvent listener.
 		_panel.addMouseListener(this);
 
-		map= new Map();
+
 	}
 
 	protected void paintElement() {
@@ -196,44 +198,60 @@ public class MyFrame extends JFrame implements MouseListener {
 				Packman p=packmans.next();
 				_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
 				_paper.setFont(new Font("Monospaced", Font.PLAIN, 14));               
-				_paper.drawString("("+Integer.toString(p.getLocation().getX())+", "+Integer.toString(p.getLocation().getY())+")"
+				_paper.drawString("("+Double.toString(p.getLocationGPS().get_x()).substring(0, 7)+", "
+				+Double.toString(p.getLocationGPS().get_y()).substring(0, 7)+")"
 						,p.getLocation().getX(),p.getLocation().getY()-10);
 			}
 			while(fruits.hasNext()) {
 				_paper.setColor(Color.RED);
 				Fruit f=fruits.next();
-				_paper.fillOval(f.getFruit().getX()-5,f.getFruit().getY()-5,10,10);
+				_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
 				_paper.setFont(new Font("Monospaced", Font.PLAIN, 14));               
-				_paper.drawString("("+Integer.toString(f.getFruit().getX())+", "+Integer.toString(f.getFruit().getY())+")"
-						,f.getFruit().getX(),f.getFruit().getY()-10);
+				_paper.drawString("("+Double.toString(f.getLocationGPS().get_x()).substring(0, 7)+", "
+				+Double.toString(f.getLocationGPS().get_y()).substring(0, 7)+")"
+						,f.getLocation().getX(),f.getLocation().getY()-10);
 			}
 		}
 		if(isGamer==3) {
 			ShortestPathAlgo algo= new ShortestPathAlgo(game);
-			algo.bestPathCalculation();
+			
 			path= algo.forGPS();
 			Iterator<Packman> packmans= game.getPackmans().iterator();
+
 			while(packmans.hasNext()) {
 				_paper.setColor(Color.yellow);
 				Packman p= new Packman(packmans.next());
-			//	Thread t= new Thread(p);
-			//	t.run();
+				//Thread t= new Thread(p);
+				//	Thread t2= new Thread(this);
+
+
+				//	t2.start();
+
+
+				//				try {
+				//					t.wait();
+				//				} catch (InterruptedException e) {
+				//					// TODO Auto-generated catch block
+				//					e.printStackTrace();
+				//				}
+				//				
 				_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
 
-				Iterator<Fruit> fruits= p.getEat().iterator();
+				Iterator<Fruit> fruits= p.getDataP().getEat().iterator();
 				while(fruits.hasNext()) {
 					_paper.setColor(Color.RED);
 					Fruit f=fruits.next();
-					_paper.fillOval(f.getFruit().getX()-5,f.getFruit().getY()-5,10,10);
+					_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
 
 					if(fruits.hasNext()) {
 						_paper.setColor(Color.BLACK);
-						_paper.drawLine(p.getLocation().getX(), p.getLocation().getY(), f.getFruit().getX(), f.getFruit().getY());
+						_paper.drawLine(p.getLocation().getX(), p.getLocation().getY(), f.getLocation().getX(), f.getLocation().getY());
 					}
 				}
+				//	t.notify();
 			}
-		}
 
+		}
 	}
 
 
@@ -241,7 +259,10 @@ public class MyFrame extends JFrame implements MouseListener {
 		g.clearRect(0, 0, map.getMyImage().getWidth(), map.getMyImage().getHeight());
 
 		g.drawImage(map.getMyImage(), 0, 0, this);
+
+
 		paintElement();
+
 	}
 
 
@@ -249,17 +270,91 @@ public class MyFrame extends JFrame implements MouseListener {
 	public void mousePressed(MouseEvent event) {
 		if(isGamer==1&&!stop ) {
 			Fruit f= new Fruit(event.getX(), event.getY(),map,id++);
-			game.getFruits().add(f);
+			game.add(f);
 		}
 		if(isGamer==2&&!stop) {
 			Packman p= new Packman(event.getX(),event.getY(),map,id++);
-			game.getPackmans().add(p);
+			game.add(p);
 		}
 
 		repaint();
 
 
 	}
+	public void SimpleJButton(Menu m){    
+		JFrame f=new JFrame("Button Example"); 
+		//submit button
+		JButton b=new JButton("Submit");    
+		b.setBounds(100,100,140, 40);    
+		//enter name label
+		JLabel label = new JLabel();		
+		label.setText("file name:");
+		label.setBounds(10, 10, 100, 100);
+		//empty label which will show event after button clicked
+		JLabel label1 = new JLabel();
+		label1.setBounds(10, 110, 200, 100);
+		//textfield to enter name
+		JTextField textfield= new JTextField();
+		textfield.setBounds(110, 50, 130, 30);
+		//add to frame
+		f.add(label1);
+		f.add(textfield);
+		f.add(label);
+		f.add(b);    
+		f.setSize(300,300);    
+		f.setLayout(null);    
+		f.setVisible(true);    
+
+		//f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
+
+		//action listener
+		b.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(isGamer==5) {
+					CSVWriter c= new CSVWriter();
+					c.gameToCSV("game_"+textfield.getText(),game);
+					label1.setText("Name has been submitted.");	
+				}
+				if(isGamer==6) {
+					DirectoryToKml d= new DirectoryToKml();
+					if(isRun==true) {
+						d.multyKmlFile(getPath(), "Path_"+textfield.getText());
+						label1.setText("Name has been submitted.");	
+					}
+					else {
+						label1.setText("please run first");	
+						
+
+					}
+
+				}
+				MenuItem add;
+				if(isGamer==5) {
+					add= new MenuItem("C:\\Users\\ofra\\eclipse-workspace\\ex3\\game_"+textfield.getText()+".csv");
+				}
+				else {
+					add= new MenuItem("C:\\Users\\ofra\\eclipse-workspace\\ex3\\path_"+textfield.getText()+".kml");
+				}
+				m.add(add);
+				add.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(isGamer==5) {
+							repaint();
+							game= new Game("C:\\Users\\ofra\\eclipse-workspace\\ex3\\game_"+textfield.getText()+".csv",map);
+							isGamer=4;
+							//stop=true;}
+						}
+					}
+				});
+
+			}         
+		});
+
+	}         
 	// Not Used, but need to provide an empty body for compilation
 	public void mouseReleased(MouseEvent event){}
 	public void mouseClicked(MouseEvent event){}
@@ -269,8 +364,8 @@ public class MyFrame extends JFrame implements MouseListener {
 	public Map getMap() {
 		return map;
 	}
-	public void setMap(Map map) {
-		this.map = map;
+	private void setMap(Map map) {
+		this.map = map ;
 	}
 	public Container getWindow() {
 		return window;
@@ -300,9 +395,7 @@ public class MyFrame extends JFrame implements MouseListener {
 	public Game getGame() {
 		return game;
 	}
-	public void setGame(Game game) {
-		this.game = game;
-	}
+
 	private  ArrayList<String> read(String parentDirectory){
 		File[] filesInDirectory = new File(parentDirectory).listFiles();
 		ArrayList<String> s= new ArrayList<String>();
@@ -346,14 +439,6 @@ public class MyFrame extends JFrame implements MouseListener {
 	}
 
 
-	public static void main(String[] args) {
-		MyFrame frame = new MyFrame();
-		frame.setBounds(0, 0, frame.getGame().getMap().getMyImage().getWidth(), frame.getGame().getMap().getMyImage().getHeight());
-		frame.createGui();
+	
 
-		frame.setVisible(true);
-
-
-
-	}
 }

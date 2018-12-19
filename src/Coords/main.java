@@ -1,5 +1,6 @@
 package Coords;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import File_format.CSV_handling;
@@ -8,13 +9,14 @@ import File_format.DirectoryToKml;
 import GIS.ElementMetaData;
 import GIS.GIS_element;
 import GIS.GIS_layer;
-import GIS.Game;
 import GIS.MyGisElement;
 import GIS.MyGisLayer;
 import GIS.MyGisProject;
+import Geom.Geom_element;
 import Geom.Gps_Point;
 import Geom.Pixel;
 import Geom.Point3D;
+import game.Game;
 import game.Map;
 import game.ShortestPathAlgo;
 
@@ -29,7 +31,7 @@ public class main {
 		//r.KmlWriter(r.read("WigleWifi_20171201110209.csv"),"moshe");
 	//	r.KmlWriter("WigleWifi_20171203085618.csv");
 	MyGisProject p= new MyGisProject();
-	//	d.multyKmlFile( d.read("data", p),"data");
+		d.multyKmlFile( d.read("data", p),"data");
 
 		/*	System.out.println(l.equals(l2));
 	System.out.println(l);
@@ -46,21 +48,41 @@ public class main {
 	System.out.println(e.equals(e1));
 
 		 */
+		
 
 		Map map= new Map();
-		Gps_Point gps= new Gps_Point(35.20673,32.10482,0);
-	//	Pixel p= new Pixel(625,149);
+		Gps_Point gps= new Gps_Point(35.20724539,32.10394266,0);
+		
+		Geom_element f= new Gps_Point(35.20724539,32.10394266,0);
+		Class[] c= {Gps_Point.class};
+		try {
+			System.out.println(f.getClass().getDeclaredMethod("equals",c).invoke(f, gps));
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		/*Pixel p= new Pixel(734,552);
 
 
 			System.out.println(map.converteGpsToPixel(gps));
 
-	//	System.out.println(map.convertePixelToGps(p));
-
-		Game g=new Game("game_1543693911932_a.csv",map);
+		System.out.println(map.convertePixelToGps(p));
+*/
+	//	Game g=new Game("game_1543693911932_a.csv",map);
 		//System.out.println(g);
 //		ShortestPathAlgo s= new ShortestPathAlgo(g);
 //		System.out.println(s.bestPathCalculation());
 //	d.multyKmlFile(s.bestPathCalculation(), "game");
+ catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

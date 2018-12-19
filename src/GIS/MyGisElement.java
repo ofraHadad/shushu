@@ -55,7 +55,7 @@ public class MyGisElement implements GIS_element{
 	 * @return
 	 */
 	public boolean equals(GIS_element e) {
-		if(getGeom().equals(e.getGeom()) && getData().equals(e.getData())) {
+		if(getGeom().equals(e.getGeom()) && getData().equals(e.getData()) &&( whatAmI()==e.whatAmI())){
 			return true;
 		}
 		return false;

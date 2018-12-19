@@ -2,15 +2,20 @@ package GUI;
 
 import javax.swing.JFrame;
 
+import game.Map;
+
 
 public class Main {
 
 	public static void main(String[] args) {
-		MyFrame window = new MyFrame();
-		window.setVisible(true);
-		window.setSize(window.getGame().getMap().getMyImage().getWidth(),window.getGame().getMap().getMyImage().getHeight());
+		MyFrame frame = new MyFrame(new Map());
+		frame.setBounds(0, 0, frame.getGame().getMap().getMyImage().getWidth(), frame.getGame().getMap().getMyImage().getHeight());
+		frame.createGui();
+		frame.setVisible(true);
+//
+//		frame.setResizable(true);
 
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 	}
 
 }

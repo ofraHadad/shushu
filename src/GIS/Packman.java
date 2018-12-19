@@ -9,56 +9,26 @@ import Geom.Pixel;
 import Geom.Point3D;
 import game.Map;
 
-public class Packman implements GIS_element/*, Runnable*/{
+public class Packman implements GIS_element{
 
 	private Pixel location;	
+	private Gps_Point locationGPS;
 	private Map map;
 	private PackmanMetaData dataP;
-	private ArrayList<Fruit> eat= new ArrayList<Fruit>();
-	private double time;
 
-
-
-
-	public double getTime() {
-		return time;
-	}
-
-	public void setTime(double time) {
-		this.time = time;
-	}
-
-	public ArrayList<Fruit> getEat() {
-		return eat;
-	}
-
-	public void setEat(ArrayList<Fruit> eat) {
-		this.eat = eat;
-	}
-
-	public void setLocation(Pixel location) {
-		this.location = location;
-	}
-
-	public void setMap(Map map) {
-		this.map = map;
-	}
-
-	public void setDataP(PackmanMetaData dataP) {
-		this.dataP = dataP;
-	}
 
 	public Packman(int x,int y, Map map,int id) {
 		this.map= map;
 		this.location= new Pixel(x, y);
 		this.dataP= new PackmanMetaData(id);
+		setLocationGPS(new Gps_Point(map.convertePixelToGps(getLocation())));
 		
 
 	}
 
 	public Packman(String[] line, String[] head,Map map) {
 		Gps_Point gps= new Gps_Point(head,line);
-
+		setLocationGPS(gps);
 		this.map=map;
 		location=map.converteGpsToPixel(gps);
 
@@ -70,25 +40,17 @@ public class Packman implements GIS_element/*, Runnable*/{
 		this.map= p.map;
 		this.location= new Pixel (p.getLocation());
 		this.dataP= new PackmanMetaData(p.getDataP());
-		Iterator<Fruit> it= p.getEat().iterator();
-		while(it.hasNext()) {
-			getEat().add(it.next());
-		}
+		setLocationGPS(p.getLocationGPS());
+		
 	}
 	
 	
 	
 	
 	public String toString() {
-		String ans="";
-		Iterator <Fruit> it= getEat().iterator();
-		while(it.hasNext()) {
-			ans= ans+it.next().getWhenEaten()+",";
-		}
-		return "Location: " + location + ", "+ this.dataP+", this time: "+getTime()+", time: "+ans;
+		
+		return "Location: " + location + ", "+ this.dataP;
 	}
-
-
 
 
 
@@ -109,7 +71,7 @@ public class Packman implements GIS_element/*, Runnable*/{
 
 	@Override
 	public Geom_element getGeom() {
-		return this.location;
+		return getLocationGPS();
 	}
 
 	@Override
@@ -127,20 +89,32 @@ public class Packman implements GIS_element/*, Runnable*/{
 		return 2;
 	}
 
-//	@Override
-//	public void run() {
-//
-//		for(double i=0; i<=getTime(); i++) {
-//			System.out.println(getTime());
-//			Iterator<Fruit> it= getEat().iterator();
-//			while(it.hasNext()) {
-//				Fruit f= it.next();
-//				if(f.getWhenEaten()<=i) {
-//					setLocation(f.getFruit());
-//					it.remove();
-//				}
-//			}
-//			
-//		}
-//	}
+	
+	
+	public boolean equals(GIS_element e) {
+		return getGeom().equals(e.getGeom())&&getData().equals(e.getData())&&(whatAmI()==e.whatAmI());
+		
+	}
+
+	public Gps_Point getLocationGPS() {
+		return locationGPS;
+	}
+
+	public void setLocationGPS(Gps_Point locationGPS) {
+		
+		this.locationGPS = new Gps_Point(locationGPS);
+	}
+	public void setLocation(Pixel location) {
+		this.location = location;
+	}
+
+	private void setMap(Map map) {
+		this.map = map;
+	}
+
+	private void setDataP(PackmanMetaData dataP) {
+		this.dataP = dataP;
+	}
+
+	
 }

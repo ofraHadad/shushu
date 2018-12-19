@@ -67,6 +67,14 @@ public class Gps_Point implements Geom_element   {
 		double distanceXY=Math.sqrt((Math.pow(diffMeter.x(), 2))+(Math.pow(diffMeter.y(),2)));
 		return distanceXY;
 	}
+	
+	public double distance2d(Gps_Point gps) {
+		Gps_Point diff=new Gps_Point(gps.get_x()-get_x(),gps.get_y()-get_y(),gps.get_z()-get_z());
+		double LonNorm= computeLonNorm(this);
+		Point3D diffMeter=ConvertsDegreesToMeters(diff,LonNorm);
+		double distanceXY=Math.sqrt((Math.pow(diffMeter.x(), 2))+(Math.pow(diffMeter.y(),2)));
+		return distanceXY;
+	}
 	/**
 	 * A function that checks the point in the class 
 	 * @return true if the point is gps type and false if the point is not gps type

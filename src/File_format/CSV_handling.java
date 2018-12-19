@@ -1,18 +1,12 @@
 package File_format;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 
 import GIS.Fruit;
-import GIS.GIS_element;
-import GIS.Game;
-import GIS.LayerMetaData;
-import GIS.MyGisElement;
-import GIS.MyGisLayer;
 import GIS.Packman;
+import game.Game;
 import game.Map;
 
 public class CSV_handling {

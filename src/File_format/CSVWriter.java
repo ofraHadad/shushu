@@ -9,9 +9,9 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 
 import GIS.Fruit;
-import GIS.Game;
 import GIS.Packman;
 import Geom.Gps_Point;
+import game.Game;
 
 public class CSVWriter 
 {
@@ -29,13 +29,13 @@ public class CSVWriter
 			while(packmans.hasNext()) {
 				Packman p= packmans.next();
 				Gps_Point location= game.getMap().convertePixelToGps(p.getLocation());
-				sb.append("P,"+p.getDataP().getId()+","+location.get_x()+","+location.get_y()+
+				sb.append("P,"+p.getDataP().getId()+","+location.get_y()+","+location.get_x()+
 						","+ p.getDataP().getAlt()+","+p.getDataP().getSpeed()+","+p.getDataP().getRadius()+"\n");
 			}
 			while(fruits.hasNext()) {
 				Fruit f= fruits.next();
-				Gps_Point location= game.getMap().convertePixelToGps(f.getFruit());
-				sb.append("F,"+f.getDataF().getId()+","+location.get_x()+","+location.get_y()+
+				Gps_Point location= game.getMap().convertePixelToGps(f.getLocation());
+				sb.append("F,"+f.getDataF().getId()+","+location.get_y()+","+location.get_x()+
 						","+ f.getDataF().getAlt()+","+f.getDataF().getWeight()+"\n");
 			}
 		

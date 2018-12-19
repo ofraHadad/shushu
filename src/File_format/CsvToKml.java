@@ -1,24 +1,28 @@
 package File_format;
 import java.util.Iterator;
-
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.Timestamp;
+import java.security.cert.CertPath;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
+import java.util.Date;
 
 import GIS.ElementMetaData;
 import GIS.Fruit;
 import GIS.GIS_element;
 import GIS.GIS_layer;
-import GIS.Game;
-import GIS.GameGPS;
 import GIS.LayerMetaData;
 import GIS.Meta_data;
 import GIS.MyGisElement;
 import GIS.MyGisLayer;
 import GIS.Packman;
+import game.Game;
 
 /**
  * this class read a csv file of gps points 
@@ -29,12 +33,12 @@ import GIS.Packman;
 public class CsvToKml {
 
 
-/**
- * read the file and update a layer= array list of elments
- * ,whit the data in the file;
- * @param csvFile
- * @return
- */
+	/**
+	 * read the file and update a layer= array list of elments
+	 * ,whit the data in the file;
+	 * @param csvFile
+	 * @return
+	 */
 	public MyGisLayer read(String csvFile) {
 
 		String firstLine="";
@@ -48,10 +52,10 @@ public class CsvToKml {
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) 
 		{
 			int count =0;
-			
+
 			while ((line = br.readLine()) != null) 
 			{	
-				
+
 				if(count== 1) {
 					head = line.split(cvsSplitBy);
 
@@ -91,7 +95,7 @@ public class CsvToKml {
 			BufferedWriter bw = new BufferedWriter(writer);
 			StringBuilder sb = new StringBuilder();
 			CsvToKml r= new CsvToKml();
-		//	GIS_layer layer=r.read(csvfile);
+			//	GIS_layer layer=r.read(csvfile);
 			//create kml file	
 
 
@@ -110,7 +114,7 @@ public class CsvToKml {
 
 			sb.append("\n</Folder>\n");
 			sb.append("</Document></kml>");
-			
+
 			bw.write(sb.toString());
 			bw.close();
 
@@ -120,8 +124,8 @@ public class CsvToKml {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 	}
 
 	public String content(GIS_layer layer) {
@@ -130,7 +134,7 @@ public class CsvToKml {
 		while(itLayer.hasNext()) {
 			MyGisElement e= (MyGisElement) itLayer.next();
 			ans=ans+("<Placemark>\n");
-		//	ans=ans+(" <TimeStamp> \n <when> "+ e.getMetaData().getFirstSeen()+" </when \n"+"</TimeStamp> \n");
+			//	ans=ans+(" <TimeStamp> \n <when> "+ e.getMetaData().getFirstSeen()+" </when \n"+"</TimeStamp> \n");
 			ans=ans+("<name>"+"<![CDATA["+e.getMetaData().getSSID()+"]]>"  +"</name>\n");
 			ans=ans+("<description>"+"<![CDATA[BSSID: <b>"+e.getMetaData().getMAC()+"</b><br/>Capabilities: <b>"
 					+e.getMetaData().getAuthMode()+"</b><br/>Channel: <b>"+e.getMetaData().getChannel()+
@@ -146,27 +150,44 @@ public class CsvToKml {
 
 
 	}
-	
+
 	public String contentPath(GIS_layer layer) {
 		Iterator<GIS_element> itLayer= layer.iterator();
+		
 		String ans="";
-		int count=0;
 		while(itLayer.hasNext()) {
 		
-			GameGPS e= new GameGPS( (GameGPS)itLayer.next()) ;
-
-			ans=ans+("<Placemark>\n");
-		//	ans=ans+(" <TimeStamp> \n <when> "+ e.getMetaData().getFirstSeen()+" </when \n"+"</TimeStamp> \n");
-			ans=ans+("<name>"+"<![CDATA["+e.getDataP().getId()+"]]>"  +"</name>\n");
-			ans=ans+("<description>"+"<![CDATA[Grade: <b>"+e.getDataP().getGrade()+"</b><br/>Timestamp: <when>"+
-					e.getUTC()+"</when>"+"<br/>Date: <b>2017-12-01 10:44:05</b>]]></description><styleUrl>#yellow</styleUrl>\n");
-			ans=ans+("<Point>\n");
-			ans=ans+("<coordinates>"+e.getLocation().get_x()+","+e.getLocation().get_y()+"</coordinates></Point>\n");
-			ans=ans+("</Placemark>\n");
+			GIS_element e=  itLayer.next() ;
+			String data= e.getData().toString();
+			String location= e.getGeom().toString();
+			double s= Double.parseDouble(data.substring(data.indexOf("Start: ")+7,data.indexOf(";")));
 			
+			
+			
+			ans=ans+("<Placemark>\n");
+			ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
+			ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))
+			+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+"10:10:00."+(long)(s*1000)+"</begin>"
+					+"<end>2017-12-01T"+"10:10:00."+e.getData().getUTC() +"</end>\n</TimeSpan>");
+			if(e.whatAmI()==2) {
+				ans=ans+"<styleUrl>#yellow</styleUrl>\n";
+			}
+			if(e.whatAmI()==1) {
+				ans=ans+"<styleUrl>#red</styleUrl>\n";
+			}
+			String x=location.substring(1,location.indexOf(","));
+			
+			location= location.substring(x.length()+2);
+			String y=location.substring(0,location.indexOf(','));
+			
+			ans=ans+("<Point>\n");
+			ans=ans+("<coordinates>"+x+","+y+"</coordinates></Point>\n");
+			ans=ans+("</Placemark>\n"); 
+		
 
 		}
 		return ans;
 	}
+	
 
 }

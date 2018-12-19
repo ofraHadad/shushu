@@ -3,15 +3,11 @@ package game;
 import java.util.Iterator;
 
 import GIS.Fruit;
-import GIS.GIS_layer;
-import GIS.GIS_project;
-import GIS.Game;
-import GIS.GameGPS;
-import GIS.MyGisElement;
+
 import GIS.MyGisLayer;
 import GIS.Packman;
 import GIS.Path;
-import Geom.Gps_Point;
+
 
 /**
  *  @author Shira & ofra
@@ -20,6 +16,7 @@ import Geom.Gps_Point;
 ////////////////////Constructor\\\\\\\\\\\\\\\\\\
 public class ShortestPathAlgo {
 	private Game game;
+	
 	/**
 	 * Constructor that get a game
 	 * @param game
@@ -30,64 +27,125 @@ public class ShortestPathAlgo {
 
 
 	////////////////////Methods\\\\\\\\\\\\\\\\\\
-	public void  bestPathCalculation() {
-		Iterator<Fruit> it0=game.getFruits().iterator();
-		while(it0.hasNext()) {
-			Iterator<Packman> it1=game.getPackmans().iterator();
-			Fruit f= new Fruit(it0.next());
-			double min=-1; 
-			int i=0;
-			int counter=-1;
-			double old=0;
-			while(it1.hasNext()) {
-				Packman p=it1.next();
-				
-				counter++;
-				double disXy=(p.getLocation().distance(f.getFruit())-p.getDataP().getRadius());
-				double diff= p.getDataP().getAlt()-f.getDataF().getAlt();
-				double time= (Math.sqrt(Math.pow(disXy, 2)+Math.pow(diff, 2)))/p.getDataP().getSpeed();
-				if(time<min||min==-1) {
-					min=time;
-					i=counter;
-					old= game.getPackmans().get(i).getTime()+min;
+
+	public void pathalgo() {
+
+		Iterator<Fruit> it= getGame().getFruits().iterator();
+
+		int size=getGame().getPackmans().size();
+		double close[][]= new double[4][size];//0-packman, 1- fruit, 2- time, 3- grade
+		close[0][0]=-1;
+
+		while(it.hasNext()) {
+			for(int i=0; i<size; i++) {
+				Packman p= getGame().getPackmans().get(i);
+				if(close[0][i]==-2||close[0][0]==-1) {
+					for(int j=0; j<getGame().getFruits().size();j++) {
+						Fruit f= getGame().getFruits().get(j);
+						double dis=(p.getLocationGPS().distance3d(f.getLocationGPS())-p.getDataP().getRadius());
+
+						double time= (dis)/p.getDataP().getSpeed();
+						if(time<0) {//when in the same place (distance3d=0 - raduis) 
+							time=0;
+						}
+						if(close[0][i]<0) {
+							close[0][i]=time;
+							close[1][i]=j;
+						}
+						if(time<close[0][i]) {
+							close[0][i]=time;
+							close[1][i]=j;
+						}
+					}
 				}
 			}
-			f.setWhenEaten(old);
-			game.getPackmans().get(i).setTime(old);
-			game.getPackmans().get(i).getEat().add(f);
-			game.getPackmans().get(i).getLocation().setX(f.getFruit().getX());
-			game.getPackmans().get(i).getLocation().setY(f.getFruit().getY());
+			double min= close[0][0];
+			int f=(int) close[1][0];
+			int p=0;
+			for(int i=0; i<size; i++) {
+				if(min>close[0][i] ){
+					min=close[0][i];
+					f=(int) close[1][i];
+					p=i;
+				}
+			}
+			for(int i=0; i<size; i++) {
 
-			it0.remove();
+				if(i==p) {
+					if(i!=size-1) {
+						i++;
+					}
+					else {
+						break;
+					}
+				}
 
+				if(f==close[1][i] ){
+					close[0][i]=-2;
+				}
+				if(close[1][i]>f) {
+					close[1][i]--;
+				}
+			}
+			close[2][p]=close[2][p]+min;
+			Fruit now=getGame().getFruits().get(f);
+			close[3][p]=close[3][p]+now.getDataF().getWeight();
+
+			now.getDataF().setWhenEaten(close[2][p]);
+			getGame().getPackmans().get(p).getDataP().getEat().add(now);
+			
+			getGame().getFruits().remove(f);
+			close[0][p]=-2;
 		}
-		
-		
+
 	}
-	
+
+
 	public Path forGPS() {
-		bestPathCalculation();
-		Iterator<Packman> it1=game.getPackmans().iterator();
+		pathalgo();
+		Iterator<Packman> it1=getGame().getPackmans().iterator();
 		Path path= new Path();
 		while(it1.hasNext()) {
-			Packman pack= new Packman(it1.next());
+			Packman pack=it1.next();
 			MyGisLayer layer= new MyGisLayer();
-			layer.add(new GameGPS(pack));
-			Iterator<Fruit> it=pack.getEat().iterator();
+			layer.add(pack);
+			Iterator<Fruit> it=pack.getDataP().getEat().iterator();
+			Iterator<Fruit> it2=pack.getDataP().getEat().iterator();
+
+			Fruit fNext=it2.next();
+			pack.getDataP().setTimeNext(fNext.getDataF().getWhenEaten());
+			int grade=0;
 			while(it.hasNext()) {
+
 				Fruit f= new Fruit(it.next());
+				Packman pNext= new Packman(pack);
+
 				
-				int grade= pack.getDataP().getGrade()+f.getDataF().getWeight();
-				pack.getDataP().setGrade(grade);
-				layer.add(new GameGPS(f,pack.getDataP()));
+
+				pNext.getDataP().setTime(f.getDataF().getWhenEaten());
+				layer.add(f);
+				layer.add(pNext);
+
+				grade=grade+f.getDataF().getWeight();
+				pNext.getDataP().setGrade(grade);
+				pNext.setLocationGPS(f.getLocationGPS());
+				if(it2.hasNext()) {
+					pNext.getDataP().setTimeNext(it2.next().getDataF().getWhenEaten());
+
+
+				}
+				else {
+					pNext.getDataP().setTimeNext(pNext.getDataP().getTime()*100);
+
+
+				}
+
 			}
 			path.add(layer);
 		}
+		System.out.println(path);
 		return path;
 	}
-	
-	
-
 
 	public Game getGame() {
 		return game;

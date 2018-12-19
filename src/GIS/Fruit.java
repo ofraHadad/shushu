@@ -7,15 +7,17 @@ import Geom.Point3D;
 import game.Map;
 
 public class Fruit implements GIS_element{
-	private Pixel fruit;
+	private Pixel location;
+	private Gps_Point locationGPS;
 	private Map map;
 	private FruitMetaData dataF;
-	private double whenEaten;
+	
 
 	public Fruit(int x, int y,Map map,int id) {
 		this.map= map;
-		fruit=new Pixel(x, y);
+		setLocation(new Pixel(x, y));
 		this.dataF= new FruitMetaData(id);
+		setLocationGPS(new Gps_Point(map.convertePixelToGps(getLocation())));
 
 	}
 
@@ -23,10 +25,9 @@ public class Fruit implements GIS_element{
 
 	public Fruit(String[] line, String[] head,Map map) {
 
-		Gps_Point gps= new Gps_Point(head,line);
-
+		setLocationGPS(new Gps_Point(head,line));
 		this.map= map;
-		fruit=	map.converteGpsToPixel(gps);
+		setLocation(map.converteGpsToPixel(getLocationGPS()));
 
 		this.dataF= new FruitMetaData(head,line);
 
@@ -35,27 +36,21 @@ public class Fruit implements GIS_element{
 	}
 
 	public Fruit(Fruit f) {
+		setLocationGPS(new Gps_Point(f.getLocationGPS()));
 		this.map= f.map;
-		fruit= new Pixel(f.getFruit());
+		setLocation(new Pixel(f.getLocation()));
 		this.dataF= new FruitMetaData(f.dataF);
-		setWhenEaten(f.getWhenEaten());
 	}
 
 
 
 	public String toString() {
-		return "Location: " + fruit +", "+dataF+" ,Time: "+getWhenEaten();
+		return "Location: " + getLocation() +", "+dataF;
 	}
 
 
 
-	public Pixel getFruit() {
-		return fruit;
-	}
 
-	public void setFruit(Pixel fruit) {
-		this.fruit = fruit;
-	}
 
 	public Map getMap() {
 		return map;
@@ -68,7 +63,7 @@ public class Fruit implements GIS_element{
 	@Override
 	public Geom_element getGeom() {
 		// TODO Auto-generated method stub
-		return fruit;
+		return locationGPS;
 	}
 
 	@Override
@@ -79,24 +74,41 @@ public class Fruit implements GIS_element{
 
 	@Override
 	public void translate(Point3D vec) {
-		// TODO Auto-generated method stub
+
+		
 
 	}
 	@Override
 	public int whatAmI() {
 		return 1;
 	}
+	
+	public Gps_Point getLocationGPS() {
+		return locationGPS;
+	}
 
-
-
-	public double getWhenEaten() {
-		return whenEaten;
+	public void setLocationGPS(Gps_Point locationGPS) {
+		this.locationGPS = locationGPS;
 	}
 
 
 
-	public void setWhenEaten(double whenEaten) {
-		this.whenEaten = whenEaten;
+	public Pixel getLocation() {
+		return location;
+	}
+
+
+
+	private void setLocation(Pixel location) {
+		this.location = location;
+	}
+
+
+
+	@Override
+	public boolean equals(GIS_element e) {
+		// TODO Auto-generated method stub
+		return getGeom().equals(e.getGeom()) && getData().equals(e.getData())&&(whatAmI()==e.whatAmI());
 	}
 
 

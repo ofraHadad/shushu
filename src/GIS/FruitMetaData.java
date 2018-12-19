@@ -7,6 +7,8 @@ public class FruitMetaData implements Meta_data{
 	private int alt;
 	private int weight;
 	private int id;
+	private double whenEaten;
+	
 
 
 	public FruitMetaData(int id) {
@@ -46,12 +48,13 @@ public class FruitMetaData implements Meta_data{
 		setAlt(data.getAlt());
 		setId(data.getId());
 		setWeight(data.getWeight());
+		setWhenEaten(data.getWhenEaten());
 	}
 
 	@Override
 	public long getUTC() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return (long) (getWhenEaten()*1000);
 	}
 
 	@Override
@@ -62,8 +65,13 @@ public class FruitMetaData implements Meta_data{
 
 
 	public String toString() {
-		return "Alt: "+getAlt()+ ", Weight: "+getWeight()+ ", Id: "+ getId();
+		return "Alt: "+getAlt()+ ", Weight/Grade: "+getWeight()+ ", Id: "+ getId()+", Time: "+getWhenEaten()+", Start: "+0+";";
 
+	}
+	
+	public boolean eqauls(Meta_data e) {
+		return (getUTC()==e.getUTC())&&(toString().substring(toString().indexOf("Id: ")+4, toString().indexOf(", Time:")))
+				.equals(e.toString().substring(e.toString().indexOf("Id: ")+4, e.toString().indexOf(", Time:")));
 	}
 
 
@@ -103,5 +111,13 @@ public class FruitMetaData implements Meta_data{
 	public int getId() {
 		return id;
 	}
+	public double getWhenEaten() {
+		return whenEaten;
+	}
+
+	public void setWhenEaten(double whenEaten) {
+		this.whenEaten = whenEaten;
+	}
+
 
 }

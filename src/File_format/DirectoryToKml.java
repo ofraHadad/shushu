@@ -6,14 +6,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import GIS.GIS_element;
+
 import GIS.GIS_layer;
 import GIS.GIS_project;
-import GIS.LayerMetaData;
-import GIS.MyGisElement;
+
+
 import GIS.MyGisLayer;
 import GIS.MyGisProject;
 import GIS.ProjectMetaData;
+
 /**
  * this class read a folder and take the csv file of gps point 
  * and generate it to one kml file
@@ -37,7 +38,7 @@ public class DirectoryToKml {
 			}
 			String filePath = f.getAbsolutePath();
 			String fileExtenstion = filePath.substring(filePath.lastIndexOf(".") + 1,filePath.length());
-			if("csv".equals(fileExtenstion)){
+			if("csv".equals(fileExtenstion)&&filePath.contains("WigleWifi")){
 				//add to a list or array
 				CsvToKml r= new CsvToKml();
 
@@ -76,15 +77,19 @@ public class DirectoryToKml {
 					+ "http://maps.google.com/mapfiles/ms/icons/blue-dot.png</href>"
 					+ "</Icon></IconStyle></Style><Style id=\"blue\"><IconStyle><Icon><href>"
 					+ "http://maps.google.com/mapfiles/ms/icons/blue-dot.png</href>"
+					+"</Icon></IconStyle></Style><Style id=\"yellow\"><IconStyle><Icon><href>"
+					+"http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href>"
+					+"</Icon></IconStyle></Style><Style id=\"red\"><IconStyle><Icon><href>"
+					+"http://maps.google.com/mapfiles/kml/paddle/red-stars.png</href>"
 					+ "</Icon></IconStyle></Style><Style id=\"green\"><IconStyle><Icon><href>"
 					+ "http://maps.google.com/mapfiles/ms/icons/green-dot.png</href>"
 					+ "</Icon></IconStyle></Style><Folder><name>Wifi Networks</name>\r\n" + "");
 
 	
 			while(itP.hasNext()) {
-				GIS_layer layer= itP.next();
+				MyGisLayer layer= (MyGisLayer) itP.next();
 				CsvToKml s= new CsvToKml();
-				if(layer.whatAmI()==3) {
+				if(layer.get(0).whatAmI()==2) {
 				sb.append(s.contentPath(layer));
 				}
 				else {
