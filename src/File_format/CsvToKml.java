@@ -10,6 +10,7 @@ import java.security.Timestamp;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -95,9 +96,7 @@ public class CsvToKml {
 			BufferedWriter bw = new BufferedWriter(writer);
 			StringBuilder sb = new StringBuilder();
 			CsvToKml r= new CsvToKml();
-			//	GIS_layer layer=r.read(csvfile);
-			//create kml file	
-
+			
 
 
 			sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -134,7 +133,6 @@ public class CsvToKml {
 		while(itLayer.hasNext()) {
 			MyGisElement e= (MyGisElement) itLayer.next();
 			ans=ans+("<Placemark>\n");
-			//	ans=ans+(" <TimeStamp> \n <when> "+ e.getMetaData().getFirstSeen()+" </when \n"+"</TimeStamp> \n");
 			ans=ans+("<name>"+"<![CDATA["+e.getMetaData().getSSID()+"]]>"  +"</name>\n");
 			ans=ans+("<description>"+"<![CDATA[BSSID: <b>"+e.getMetaData().getMAC()+"</b><br/>Capabilities: <b>"
 					+e.getMetaData().getAuthMode()+"</b><br/>Channel: <b>"+e.getMetaData().getChannel()+
@@ -156,19 +154,20 @@ public class CsvToKml {
 		
 		String ans="";
 		while(itLayer.hasNext()) {
-		
 			GIS_element e=  itLayer.next() ;
 			String data= e.getData().toString();
 			String location= e.getGeom().toString();
-			double s= Double.parseDouble(data.substring(data.indexOf("Start: ")+7,data.indexOf(";")));
+			long s= (long) (Double.parseDouble(data.substring(data.indexOf("Start: ")+7,data.indexOf(";")))*1000);
 			
+			Time tStart= new Time(s);
+			Time tEnd= new Time(e.getData().getUTC());
 			
 			
 			ans=ans+("<Placemark>\n");
 			ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
 			ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))
-			+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+"10:10:00."+(long)(s*1000)+"</begin>"
-					+"<end>2017-12-01T"+"10:10:00."+e.getData().getUTC() +"</end>\n</TimeSpan>");
+			+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+tStart+"</begin>"
+					+"<end>2017-12-01T"+tEnd +"</end>\n</TimeSpan>");
 			if(e.whatAmI()==2) {
 				ans=ans+"<styleUrl>#yellow</styleUrl>\n";
 			}

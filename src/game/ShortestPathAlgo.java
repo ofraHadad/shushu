@@ -73,11 +73,12 @@ public class ShortestPathAlgo {
 					f=(int) close[1][i];
 					p=i;
 				}
-				if(f==close[1][i]) {
+			
+				if(f==(int)(close[1][i])) {
+					
 					if(close[2][i]<close[2][p]) {
 						close[0][p]=-2;
 						p=i;
-						f=(int) close[1][i];
 					}
 					else {
 						close[0][i]=-2;
@@ -96,14 +97,13 @@ public class ShortestPathAlgo {
 				}
 
 			
-				if(close[1][i]>f) {
+				if((int)(close[1][i])>f) {
 					close[1][i]--;
 				}
 			}
 			close[2][p]=close[2][p]+min;
 			Fruit now=getGame().getFruits().get(f);
 			close[3][p]=close[3][p]+now.getDataF().getWeight();
-
 			now.getDataF().setWhenEaten(close[2][p]);
 			getGame().getPackmans().get(p).getDataP().getEat().add(now);
 			
@@ -119,9 +119,11 @@ public class ShortestPathAlgo {
 		Iterator<Packman> it1=getGame().getPackmans().iterator();
 		Path path= new Path();
 		while(it1.hasNext()) {
+			double t=0;
 			Packman pack=it1.next();
 			MyGisLayer layer= new MyGisLayer();
 			layer.add(pack);
+			
 			Iterator<Fruit> it=pack.getDataP().getEat().iterator();
 			Iterator<Fruit> it2=pack.getDataP().getEat().iterator();
 
@@ -131,8 +133,8 @@ public class ShortestPathAlgo {
 			while(it.hasNext()) {
 
 				Fruit f= new Fruit(it.next());
+				
 				Packman pNext= new Packman(pack);
-
 				
 
 				pNext.getDataP().setTime(f.getDataF().getWhenEaten());
@@ -148,15 +150,19 @@ public class ShortestPathAlgo {
 
 				}
 				else {
-					pNext.getDataP().setTimeNext(pNext.getDataP().getTime()*100);
-
-
+					
+					t=pNext.getDataP().getTime()+10;
+					if(t>path.getData().getTime()) {
+						path.getData().setTime(t);
+					}
+					pNext.getDataP().setTimeNext(path.getData().getTime());
 				}
 
 			}
+			
+			
 			path.add(layer);
 		}
-		System.out.println(path);
 		return path;
 	}
 

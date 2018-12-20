@@ -81,7 +81,7 @@ public class PackmanMetaData implements Meta_data{
 		while(it.hasNext()) {
 			ans= ans+it.next().getDataF().getId()+",";
 		}
-		return "Alt: "+getAlt()+", Weight/Grade: "+getGrade()+", Id: "+ getId()+", Time: "+getTimeNext()+", Start: "+getTime()+";"+
+		return "Alt: "+getAlt()+", Weight/Grade: "+getGrade()+", Id: "+ getId()+", Time: "+getTimeNext()/60+", Start: "+getTime()/60+";"+
 				", Speed: "+ getSpeed()+", Radius: "+ getRadius()+", ate: "+ans;
 	}
 

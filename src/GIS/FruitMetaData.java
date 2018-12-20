@@ -53,6 +53,7 @@ public class FruitMetaData implements Meta_data{
 
 	@Override
 	public long getUTC() {
+			
 		
 		return (long) (getWhenEaten()*1000);
 	}
@@ -65,7 +66,7 @@ public class FruitMetaData implements Meta_data{
 
 
 	public String toString() {
-		return "Alt: "+getAlt()+ ", Weight/Grade: "+getWeight()+ ", Id: "+ getId()+", Time: "+getWhenEaten()+", Start: "+0+";";
+		return "Alt: "+getAlt()+ ", Weight/Grade: "+getWeight()+ ", Id: "+ getId()+", Time: "+getWhenEaten()/60+", Start: "+0.0+";";
 
 	}
 	

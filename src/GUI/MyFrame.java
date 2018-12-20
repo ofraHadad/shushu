@@ -221,20 +221,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			while(packmans.hasNext()) {
 				_paper.setColor(Color.yellow);
 				Packman p= new Packman(packmans.next());
-				//Thread t= new Thread(p);
-				//	Thread t2= new Thread(this);
-
-
-				//	t2.start();
-
-
-				//				try {
-				//					t.wait();
-				//				} catch (InterruptedException e) {
-				//					// TODO Auto-generated catch block
-				//					e.printStackTrace();
-				//				}
-				//				
+				
 				_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
 
 				Iterator<Fruit> fruits= p.getDataP().getEat().iterator();
@@ -248,7 +235,7 @@ public class MyFrame extends JFrame implements MouseListener{
 						_paper.drawLine(p.getLocation().getX(), p.getLocation().getY(), f.getLocation().getX(), f.getLocation().getY());
 					}
 				}
-				//	t.notify();
+				
 			}
 
 		}

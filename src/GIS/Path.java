@@ -7,7 +7,7 @@ import java.util.Iterator;
 public class Path implements  GIS_project{
 
 	ArrayList<GIS_layer> path= new ArrayList<GIS_layer>();
-	PathMetaData data;
+	PathMetaData data=new PathMetaData();
 	
 	@Override
 	public boolean add(GIS_layer e) {
@@ -118,6 +118,13 @@ public class Path implements  GIS_project{
 	private ArrayList<GIS_layer> getPath() {
 		return path;
 	}
+
+
+
+	public PathMetaData getData() {
+		return data;
+	}
+	
 	
 
 }

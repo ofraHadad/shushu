@@ -20,6 +20,7 @@ public class Game /*implements GIS_layer */{
 	private Map map;
 
 
+
 	public Game(Map map) {
 		this.map= map; 
 	}
@@ -73,6 +74,8 @@ public class Game /*implements GIS_layer */{
 	public Map getMap() {
 		return map;
 	}
+	
+	
 
 
 }
