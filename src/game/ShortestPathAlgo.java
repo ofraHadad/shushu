@@ -2,11 +2,8 @@ package game;
 
 import java.util.Iterator;
 
-import GIS.Fruit;
-
 import GIS.MyGisLayer;
-import GIS.Packman;
-import GIS.Path;
+import Geom.Gps_Point;
 
 
 /**
@@ -28,18 +25,25 @@ public class ShortestPathAlgo {
 
 	////////////////////Methods\\\\\\\\\\\\\\\\\\
 
-	public void pathalgo() {
+	public Gps_Point[] pathalgo() {
 
 		Iterator<Fruit> it= getGame().getFruits().iterator();
-
 		int size=getGame().getPackmans().size();
 		double close[][]= new double[4][size];//0-min time, 1- fruit, 2- time, 3- grade
+		Gps_Point first[]= new Gps_Point[size];
+		for(int i=0; i<size; i++) {
+			first[i]= getGame().getPackmans().get(i).getLocationGPS();
+		}
+
 		close[0][0]=-1;
 		boolean in=true;
 
 		while(it.hasNext()) {
 			for(int i=0; i<size; i++) {
+				
 				Packman p= getGame().getPackmans().get(i);
+				
+				
 				if(in||close[0][i]==-2) {
 					for(int j=0; j<getGame().getFruits().size();j++) {
 						Fruit f= getGame().getFruits().get(j);
@@ -68,22 +72,12 @@ public class ShortestPathAlgo {
 			int p=0;
 			for(int i=1; i<size; i++) {
 				
-				if(min>close[0][i] ){
+				if(min>close[0][i]+close[2][i] ){
 					min=close[0][i];
 					f=(int) close[1][i];
 					p=i;
 				}
 			
-				if(f==(int)(close[1][i])) {
-					
-					if(close[2][i]<close[2][p]) {
-						close[0][p]=-2;
-						p=i;
-					}
-					else {
-						close[0][i]=-2;
-					}
-				}
 			}
 			for(int i=0; i<size; i++) {
 
@@ -95,10 +89,11 @@ public class ShortestPathAlgo {
 						break;
 					}
 				}
-
-			
 				if((int)(close[1][i])>f) {
 					close[1][i]--;
+				}
+				if(f==close[1][i]) {
+					close[0][i]=-2;
 				}
 			}
 			close[2][p]=close[2][p]+min;
@@ -106,34 +101,42 @@ public class ShortestPathAlgo {
 			close[3][p]=close[3][p]+now.getDataF().getWeight();
 			now.getDataF().setWhenEaten(close[2][p]);
 			getGame().getPackmans().get(p).getDataP().getEat().add(now);
-			
+			getGame().getPackmans().get(p).setLocationGPS(now.getLocationGPS());
 			getGame().getFruits().remove(f);
 			close[0][p]=-2;
+			
 		}
+		return first;
 
 	}
 
 
 	public Path forGPS() {
-		pathalgo();
+		Gps_Point first[]=pathalgo();
 		Iterator<Packman> it1=getGame().getPackmans().iterator();
 		Path path= new Path();
+		int i=0;
 		while(it1.hasNext()) {
-			double t=0;
 			Packman pack=it1.next();
-			MyGisLayer layer= new MyGisLayer();
-			layer.add(pack);
-			
-			Iterator<Fruit> it=pack.getDataP().getEat().iterator();
+
+			Iterator<Fruit> it= pack.getDataP().getEat().iterator();
 			Iterator<Fruit> it2=pack.getDataP().getEat().iterator();
 
-			Fruit fNext=it2.next();
-			pack.getDataP().setTimeNext(fNext.getDataF().getWhenEaten());
+			double t=0;
+			MyGisLayer layer= new MyGisLayer();
+			pack.setLocationGPS(first[i]);
+			i++;
+			layer.add(pack);
+			
+			if(it2.hasNext()) {
+				it2.next();
+				}
 			int grade=0;
 			while(it.hasNext()) {
-
-				Fruit f= new Fruit(it.next());
 				
+				Fruit f= new Fruit(it.next());
+				pack.getDataP().setTimeNext(f.getDataF().getWhenEaten());
+
 				Packman pNext= new Packman(pack);
 				
 
@@ -155,7 +158,7 @@ public class ShortestPathAlgo {
 					if(t>path.getData().getTime()) {
 						path.getData().setTime(t);
 					}
-					pNext.getDataP().setTimeNext(path.getData().getTime());
+				 	pNext.getDataP().setTimeNext(path.getData().getTime());
 				}
 
 			}

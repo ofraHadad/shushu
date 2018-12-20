@@ -3,7 +3,6 @@ package Coords;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import File_format.CSV_handling;
 import File_format.CsvToKml;
 import File_format.DirectoryToKml;
 import GIS.ElementMetaData;

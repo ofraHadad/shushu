@@ -1,15 +1,14 @@
 package game;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.Iterator;
 
-//import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Convert;
-
-import File_format.CSV_handling;
-import GIS.Fruit;
 import GIS.GIS_element;
-import GIS.Packman;
 import Geom.Gps_Point;
 import Geom.Pixel;
 
@@ -26,14 +25,14 @@ public class Game /*implements GIS_layer */{
 	}
 	public Game(String csvFile, Map map) {
 		this.map= map;
-		CSV_handling c= new CSV_handling();
-		c.read(csvFile, 0, map, this);
+		
+		read(csvFile, 0, map, this);
 	}
 
 	public String toString() {
 		String ans="";
-		Iterator itFruits= getFruits().iterator();
-		Iterator itPackmans= getPackmans().iterator();
+		Iterator<Fruit> itFruits= getFruits().iterator();
+		Iterator<Packman> itPackmans= getPackmans().iterator();
 		while(itPackmans.hasNext()) {
 			ans= ans+"Packman: "+itPackmans.next().toString()+"\n";
 		}
@@ -61,11 +60,136 @@ public class Game /*implements GIS_layer */{
 		return false;
 	}
 	
+	public  void toCSV(String fileName) {
+		FileWriter writer;
+		try {
+			writer = new FileWriter(fileName+".csv");
+			BufferedWriter bw = new BufferedWriter(writer);
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("Type,id,Lat,Lon,Alt,Speed/Weight,Raius,"+getPackmans().size()+","+getFruits().size()+"\n");
+			Iterator<Packman> packmans= getPackmans().iterator();
+			Iterator<Fruit> fruits=getFruits().iterator();
+			while(packmans.hasNext()) {
+				Packman p= packmans.next();
+				Gps_Point location=getMap().convertePixelToGps(p.getLocation());
+				sb.append("P,"+p.getDataP().getId()+","+location.get_y()+","+location.get_x()+
+						","+ p.getDataP().getAlt()+","+p.getDataP().getSpeed()+","+p.getDataP().getRadius()+"\n");
+			}
+			while(fruits.hasNext()) {
+				Fruit f= fruits.next();
+				Gps_Point location=getMap().convertePixelToGps(f.getLocation());
+				sb.append("F,"+f.getDataF().getId()+","+location.get_y()+","+location.get_x()+
+						","+ f.getDataF().getAlt()+","+f.getDataF().getWeight()+"\n");
+			}
+		
+
+			bw.write(sb.toString());
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		
+	}
+	private Game read(String csvFile,int firstLine, Map map, Game game) {
+
+		String line = "";
+		String cvsSplitBy = ",";
+		int column=0;
+		
+
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) 
+		{
+			int count =firstLine;
+			
+			while (count==firstLine&&(line = br.readLine()) != null) 
+			{
+				String[] head= line.split(cvsSplitBy);
+				column= head.length;
+				count++;
+				
+				
+			}
+		}
+			
+		catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String[] head= new String [column];
+
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) 
+		{
+			int count =firstLine;
+
+			while ((line = br.readLine()) != null) 
+			{	
+				if(count== firstLine) {
+					head = line.split(cvsSplitBy);
+
+				}
+
+
+				if(count>firstLine) {
+					String[] userInfo = line.split(cvsSplitBy);
+					int isValid= serch(head,"Type");
+					if(isValid>=head.length) {
+						throw new RuntimeException("invalid input");
+					}
+					int isPackman= serch(userInfo,"P");
+					if(isPackman<userInfo.length) {
+						game.getPackmans().add(new Packman(userInfo,head,map));
+
+					}
+					else {
+						int isFruit= serch(userInfo, "F");
+						if(isFruit<userInfo.length) {
+							game.getFruits().add(new Fruit(userInfo,head,map));
+						}
+						else {
+							throw new RuntimeException("the type of the point is not in the file");
+						}
+
+					}
+				}
+				count++;
+			}
+
+		
+
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		return game;
+	}
 	
-	public ArrayList<Fruit> getFruits() {
+	private int serch(String[] head,String s) {
+		int index=head.length;
+		for (int i=0; i<head.length; i++) {
+			if(s.equals(head[i])||s.contentEquals(head[i])) {
+				index= i;
+				return index;
+			}
+		}
+
+
+		return index;
+	}
+
+
+	
+
+	
+	protected ArrayList<Fruit> getFruits() {
 		return fruits;
 	}
-	public ArrayList<Packman> getPackmans() {
+	protected ArrayList<Packman> getPackmans() {
 		return packmans;
 	}
 

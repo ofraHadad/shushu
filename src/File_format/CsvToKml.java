@@ -15,15 +15,15 @@ import java.util.Arrays;
 import java.util.Date;
 
 import GIS.ElementMetaData;
-import GIS.Fruit;
 import GIS.GIS_element;
 import GIS.GIS_layer;
 import GIS.LayerMetaData;
 import GIS.Meta_data;
 import GIS.MyGisElement;
 import GIS.MyGisLayer;
-import GIS.Packman;
+import game.Fruit;
 import game.Game;
+import game.Packman;
 
 /**
  * this class read a csv file of gps points 
@@ -95,9 +95,6 @@ public class CsvToKml {
 			FileWriter writer = new FileWriter(name+".kml");
 			BufferedWriter bw = new BufferedWriter(writer);
 			StringBuilder sb = new StringBuilder();
-			CsvToKml r= new CsvToKml();
-			
-
 
 			sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			sb.append("<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document><Style id=\"blue\"><IconStyle><Icon><href>"
@@ -149,44 +146,75 @@ public class CsvToKml {
 
 	}
 
-	public String contentPath(GIS_layer layer) {
+	public String contentPath(GIS_layer layer, long last) {
 		Iterator<GIS_element> itLayer= layer.iterator();
-		
+
 		String ans="";
 		while(itLayer.hasNext()) {
 			GIS_element e=  itLayer.next() ;
 			String data= e.getData().toString();
 			String location= e.getGeom().toString();
 			long s= (long) (Double.parseDouble(data.substring(data.indexOf("Start: ")+7,data.indexOf(";")))*1000);
-			
-			Time tStart= new Time(s);
-			Time tEnd= new Time(e.getData().getUTC());
-			
-			
-			ans=ans+("<Placemark>\n");
-			ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
-			ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))
-			+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+tStart+"</begin>"
-					+"<end>2017-12-01T"+tEnd +"</end>\n</TimeSpan>");
-			if(e.whatAmI()==2) {
-				ans=ans+"<styleUrl>#yellow</styleUrl>\n";
-			}
-			if(e.whatAmI()==1) {
-				ans=ans+"<styleUrl>#red</styleUrl>\n";
-			}
-			String x=location.substring(1,location.indexOf(","));
-			
-			location= location.substring(x.length()+2);
-			String y=location.substring(0,location.indexOf(','));
-			
-			ans=ans+("<Point>\n");
-			ans=ans+("<coordinates>"+x+","+y+"</coordinates></Point>\n");
-			ans=ans+("</Placemark>\n"); 
-		
 
+			Time tStart= new Time(s);
+			Time tEnd;
+			if(itLayer.hasNext()) {
+				
+				 tEnd= new Time(e.getData().getUTC());
+
+
+				ans=ans+("<Placemark>\n");
+				ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
+				ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))
+				+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+tStart+"</begin>"
+				+"<end>2017-12-01T"+tEnd +"</end>\n</TimeSpan>");
+				if(e.whatAmI()==2) {
+					ans=ans+"<styleUrl>#yellow</styleUrl>\n";
+				}
+				if(e.whatAmI()==1) {
+					ans=ans+"<styleUrl>#red</styleUrl>\n";
+				}
+				String x=location.substring(1,location.indexOf(","));
+
+				location= location.substring(x.length()+2);
+				String y=location.substring(0,location.indexOf(','));
+
+				ans=ans+("<Point>\n");
+				ans=ans+("<coordinates>"+x+","+y+"</coordinates></Point>\n");
+				ans=ans+("</Placemark>\n"); 
+
+
+			}
+			else {
+				
+				 tEnd= new Time(last);
+
+
+				ans=ans+("<Placemark>\n");
+				ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
+				ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))
+				+"</b>]]></description><TimeSpan><begin>"+"2017-12-01T"+tStart+"</begin>"
+				+"<end>2017-12-01T"+tEnd +"</end>\n</TimeSpan>");
+				if(e.whatAmI()==2) {
+					ans=ans+"<styleUrl>#yellow</styleUrl>\n";
+				}
+				if(e.whatAmI()==1) {
+					ans=ans+"<styleUrl>#red</styleUrl>\n";
+				}
+				String x=location.substring(1,location.indexOf(","));
+
+				location= location.substring(x.length()+2);
+				String y=location.substring(0,location.indexOf(','));
+
+				ans=ans+("<Point>\n");
+				ans=ans+("<coordinates>"+x+","+y+"</coordinates></Point>\n");
+				ans=ans+("</Placemark>\n"); 
+
+			}
 		}
+		
 		return ans;
 	}
-	
+
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import Geom.Point3D;
+import game.Fruit;
 
 public class PackmanMetaData implements Meta_data{
 	private int id;
@@ -76,13 +77,10 @@ public class PackmanMetaData implements Meta_data{
 	
 
 	public String toString() {
-		String ans="";
 		Iterator <Fruit> it= getEat().iterator();
-		while(it.hasNext()) {
-			ans= ans+it.next().getDataF().getId()+",";
-		}
+		
 		return "Alt: "+getAlt()+", Weight/Grade: "+getGrade()+", Id: "+ getId()+", Time: "+getTimeNext()/60+", Start: "+getTime()/60+";"+
-				", Speed: "+ getSpeed()+", Radius: "+ getRadius()+", ate: "+ans;
+				", Speed: "+ getSpeed()+", Radius: "+ getRadius();
 	}
 
 	@Override

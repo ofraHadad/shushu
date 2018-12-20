@@ -6,10 +6,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Geom.Geom_element;
 import Geom.Gps_Point;
 import Geom.Pixel;
-import Geom.Point3D;
+
 
 public class Map {
 

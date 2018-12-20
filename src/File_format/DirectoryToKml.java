@@ -90,7 +90,7 @@ public class DirectoryToKml {
 				MyGisLayer layer= (MyGisLayer) itP.next();
 				CsvToKml s= new CsvToKml();
 				if(layer.get(0).whatAmI()==2) {
-				sb.append(s.contentPath(layer));
+				sb.append(s.contentPath(layer,project.get_Meta_data().getUTC()));
 				}
 				else {
 					sb.append(s.content(layer));
