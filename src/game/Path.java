@@ -9,11 +9,16 @@ import GIS.GIS_project;
 import GIS.Meta_data;
 import GIS.PathMetaData;
 
+/**
+ * represent the best path of all th packmans. implements GIS_project.
+ * @author ofra and shira
+ *
+ */
 public class Path implements  GIS_project{
 
 	ArrayList<GIS_layer> path= new ArrayList<GIS_layer>();
 	PathMetaData data=new PathMetaData();
-	
+	/////////////////////////////GIS_project//////////////////////////////////
 	@Override
 	public boolean add(GIS_layer e) {
 		if(contains(e)) {
@@ -111,7 +116,10 @@ public class Path implements  GIS_project{
 
 		return data;
 	}
-	
+//////////////////////////////methods//////////////////////////////
+	/**
+	 * a string represents the path
+	 */
 	public String toString() {
 		Iterator<GIS_layer> it= path.iterator();
 		String ans="";
@@ -120,6 +128,8 @@ public class Path implements  GIS_project{
 		}
 		return ans;
 	}
+	
+	///////////////////////////Getters and Setters/////////////////////////////////////////////
 	private ArrayList<GIS_layer> getPath() {
 		return path;
 	}

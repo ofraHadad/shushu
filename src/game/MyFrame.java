@@ -1,34 +1,34 @@
 
+
 package game;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
-import java.io.IOException;
-import java.security.Key;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.imageio.ImageIO;
-import javax.management.loading.PrivateClassLoader;
 import javax.swing.*;
 
-import File_format.CsvToKml;
-import File_format.DirectoryToKml;
-import GIS.GIS_layer;
-import GIS.MyGisLayer;
-import GIS.MyGisProject;
-import GIS.ProjectMetaData;
+import Coords.MyCoords;
+import Geom.Gps_Point;
+import Geom.Pixel;
+import Geom.Vector;
+import Robot.GameBoard;
+import Robot.Play;
+
 
 
 /**
- *
- * @author annaf
+ *a gui that represent the game.
+ * ***does not support a resize ability yet*** 
+ * @author ofra and shira
  */
 public class MyFrame extends JFrame implements MouseListener{
 
-	public Map map;
+	private Map map;
 	private Container window;
 	private JPanel _panel;
 	private Graphics _paper;
@@ -36,23 +36,33 @@ public class MyFrame extends JFrame implements MouseListener{
 	private Game game;
 	private int id=1;
 	private boolean stop;
-	private int gameNum=1;
+	public GameBoard v;
+	private Player me;
 	private Path path;
-	private int pathNum=1;
+	private Play play1;
 	private boolean isRun;
+	private MenuBar menuBar;
+	public static Image scaledImage;
+	int i=1;
+	MyCoords c=new MyCoords();
 
 	public MyFrame(Map map){
+
 		super("Map Demo"); //setTitle("Map Counter");  // "super" Frame sets its title
 		//	Moves and resizes this component. 
 		//	The new location of the top-left corner is  specified by x and y, 
 		//	and the new size is specified by width and height
 		//	setBounds(x,y,width,height)
 		setMap(map);
-		this.setBounds(0,0,getMap().getMyImage().getWidth(),getMap().getMyImage().getHeight()); //setSize(1433,700);        // "super" Frame sets its initial window size
+
 		//      Exit the program when the close-window button clicked
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		game=new Game(map);
+		this.setBounds(0,0,1300,600); //setSize(1433,700);        // "super" Frame sets its initial window size
+		createGui();
+		setVisible(true);
+		setResizable(false);
 
 	}
 
@@ -63,32 +73,54 @@ public class MyFrame extends JFrame implements MouseListener{
 		window = this.getContentPane(); 
 		window.setLayout(new FlowLayout());
 
+
 		//Add "panel" to be used for drawing            
 		_panel = new JPanel();
-		Dimension d= new Dimension(map.getMyImage().getWidth(),map.getMyImage().getHeight());
+		Dimension d= new Dimension(getWidth(),getHeight());
 		_panel.setPreferredSize(d);		               
 		window.add(_panel);
 
 		// A menu-bar contains menus. A menu contains menu-items (or sub-Menu)
-		MenuBar menuBar;   // the menu-bar
-		Menu menu, data, menu2;         // each menu in the menu-bar
-		MenuItem fruit,run, packman,save,saveKML; // an item in a menu
+		// the menu-bar
+		Menu menu, menu2,kml,csv,clearGame;         // each menu in the menu-bar
+		MenuItem fruit,run,save,clear; // an item in a menu
 		menuBar = new MenuBar();
 
-		data=new Menu("data");
-		menuBar.add(data);
-		Iterator<String> it=read("data").iterator();
+		clearGame= new Menu("clear game");
+		menuBar.add(clearGame);
+		clear= new MenuItem("clear");
+		clearGame.add(clear);
+		clear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				repaint();
+				game= new Game(getMap());
+				me=null;
+			}
+		});
+
+
+
+		csv= new Menu("saved games");
+		menuBar.add(csv);
+
+		Iterator<String> it=read("data","csv","Ex4_OOP_example").iterator();
 		while(it.hasNext()) {
 			String s= it.next();
 			MenuItem m= new MenuItem(s);
-			data.add(m);
+			csv.add(m);
 			m.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					repaint();
+					play1 = new Play(s);
+					ArrayList<String> board_data = play1.getBoard();
 
-					game= new Game(s,map);
+					game= new Game(board_data,getMap());
+
+
 					isGamer=4;
 					//stop=true;
 
@@ -101,28 +133,9 @@ public class MyFrame extends JFrame implements MouseListener{
 		menu = new Menu("Play");
 		//menu.setMnemonic(KeyEvent.VK_A);  // alt short-cut key
 		menuBar.add(menu);  // the menu-bar adds this menu
-
-
-		save= new MenuItem("Save game");
-		menu.add(save);
-		save.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isGamer=5;
-				SimpleJButton(data);
-
-
-			}
-		});
-
-
-
-
-
 		menu2= new Menu("Run");
 		menuBar.add(menu2);
-		run= new MenuItem("Run");
+		run= new MenuItem("Play yourself");
 		menu2.add(run);
 		run.addActionListener(new ActionListener() {
 
@@ -135,19 +148,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			}
 		});
 
-		saveKML= new MenuItem("Save path");
-		menu2.add(saveKML);
-		saveKML.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isGamer=6;
-
-				SimpleJButton(menu2);
-
-			}
-		});
-		fruit = new MenuItem("fruit");
+		fruit = new MenuItem("player");
 		menu.add(fruit); // the menu adds this item
 		fruit.addActionListener(new ActionListener() {
 			@Override
@@ -155,18 +156,6 @@ public class MyFrame extends JFrame implements MouseListener{
 				isGamer = 1;
 			}
 		});
-		packman = new MenuItem("packman");
-		menu.add(packman); // the menu adds this item
-		packman.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isGamer = 2;
-			}
-		}); 
-
-
-
-
 		setMenuBar(menuBar);  // "this" JFrame sets its menu-bar
 		JLabel labelMap = new JLabel();
 		//labelMap.setIcon(imgBck);
@@ -175,68 +164,62 @@ public class MyFrame extends JFrame implements MouseListener{
 		// panel (source) fires the MouseEvent.
 		//panel adds "this" object as a MouseEvent listener.
 		_panel.addMouseListener(this);
-
-
 	}
 
 	protected void paintElement() {
 		//	The method getGraphics is called to obtain a Graphics object
 
 		_paper = _panel.getGraphics();
-		if(isGamer!=3) {
-			Iterator<Fruit> fruits= game.getFruits().iterator();
-			Iterator<Packman> packmans= game.getPackmans().iterator();
-			while(packmans.hasNext()) {
-				_paper.setColor(Color.yellow);
-				Packman p=packmans.next();
-				_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
-				_paper.setFont(new Font("Monospaced", Font.PLAIN, 14));               
-				_paper.drawString("("+Double.toString(p.getLocationGPS().get_x()).substring(0, 7)+", "
-				+Double.toString(p.getLocationGPS().get_y()).substring(0, 7)+")"
-						,p.getLocation().getX(),p.getLocation().getY()-10);
-			}
-			while(fruits.hasNext()) {
-				_paper.setColor(Color.RED);
-				Fruit f=fruits.next();
-				_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
-				_paper.setFont(new Font("Monospaced", Font.PLAIN, 14));               
-				_paper.drawString("("+Double.toString(f.getLocationGPS().get_x()).substring(0, 7)+", "
-				+Double.toString(f.getLocationGPS().get_y()).substring(0, 7)+")"
-						,f.getLocation().getX(),f.getLocation().getY()-10);
-			}
+
+		Iterator<Box> boxes= game.getBoxes().iterator();
+		Iterator<Ghost> ghosts= game.getGhosts().iterator();
+		Iterator<Fruit> fruits= game.getFruits().iterator();
+		
+		Iterator<Packman> packmans= game.getPackmans().iterator();
+		
+		while(boxes.hasNext()) {
+			_paper.setColor(Color.BLACK);
+			Box b=boxes.next();
+			_paper.fillRect(b.getLocation().getX(), b.getLocation().getY(), b.getWidth(), b.getHetigh());
 		}
-		if(isGamer==3) {
-			ShortestPathAlgo algo= new ShortestPathAlgo(game);
-			
-			path= algo.forGPS();
-			Iterator<Packman> packmans= game.getPackmans().iterator();
+		while(packmans.hasNext()) {
+			_paper.setColor(Color.yellow);
+			Packman p=packmans.next();
+			_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
 
-			while(packmans.hasNext()) {
-				_paper.setColor(Color.yellow);
-				Packman p= new Packman(packmans.next());
-				
-				_paper.fillOval(p.getLocation().getX()-10,p.getLocation().getY()-10,20,20);
+		}
+		while(fruits.hasNext()) {
+			_paper.setColor(Color.RED);
+			Fruit f=fruits.next();
+			_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
 
-				Iterator<Fruit> fruits= p.getDataP().getEat().iterator();
-				while(fruits.hasNext()) {
-					_paper.setColor(Color.RED);
-					Fruit f=fruits.next();
-					_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
-
-					if(fruits.hasNext()) {
-						_paper.setColor(Color.BLACK);
-						_paper.drawLine(p.getLocation().getX(), p.getLocation().getY(), f.getLocation().getX(), f.getLocation().getY());
-					}
-				}
-			}
+		}
+		while(ghosts.hasNext()) {
+			_paper.setColor(Color.GREEN);
+			Ghost g=ghosts.next();
+			_paper.fillOval(g.getLocation().getX()-13,g.getLocation().getY()-13,26,26);
+		}
+		
+		if(me!=null) {
+			_paper.setColor(Color.PINK);
+			_paper.fillOval(me.getLocation().getX()-15,me.getLocation().getY()-15,30,30);
 		}
 	}
 
 
-	public void paint(Graphics g) {
-		g.clearRect(0, 0, map.getMyImage().getWidth(), map.getMyImage().getHeight());
 
-		g.drawImage(map.getMyImage(), 0, 0, this);
+
+
+	public void paint(Graphics g) {
+		//g.clearRect(-8, 0, map.getMyImage().getWidth(), map.getMyImage().getHeight());
+		//repaint();
+		//		scaledImage = map.getMyImage().getScaledInstance(this.getWidth()-20,this.getHeight()-60,Image.SCALE_SMOOTH);
+		//		g.drawImage(scaledImage, 10, 50, this);
+
+		Image temp=getMap().getMyImage().getScaledInstance(this.getWidth()-5, this.getHeight()-50,getMap().getMyImage().SCALE_SMOOTH);
+		g.drawImage(temp, 0, 45,null);
+
+		//		
 
 
 		paintElement();
@@ -247,68 +230,37 @@ public class MyFrame extends JFrame implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent event) {
 		if(isGamer==1&&!stop ) {
-			Fruit f= new Fruit(event.getX(), event.getY(),map,id++);
-			game.add(f);
+			me= new Player(event.getX(), event.getY(),map);
+			play1.setInitLocation( me.getLocationGPS().get_y(),me.getLocationGPS().get_x());
+
 		}
-		if(isGamer==2&&!stop) {
-			Packman p= new Packman(event.getX(),event.getY(),map,id++);
-			game.add(p);
+		if(isGamer==3) {
+			Pixel pressed= new Pixel(event.getX(),event.getY());
+			Vector v= new Vector(me.getLocationGPS(),getMap().convertePixelToGps(pressed));
+			me.setLocationGPS(v.goTo(me.getLocationGPS(),20/10));
+			play1.start();
+			
+			play1.rotate(c.azimuth(me.getLocationGPS(), getMap().convertePixelToGps(pressed)));
+			ArrayList<String> board_data = play1.getBoard();
+			game= new Game(board_data,getMap());
+			
+			
+
+			String info = play1.getStatistics();
+			System.out.println(info);
 		}
+
 
 		repaint();
 
 
+
+
+
+
 	}
-	public void SimpleJButton(Menu m){    
-		JFrame f=new JFrame("Button Example"); 
-		//submit button
-		JButton b=new JButton("Submit");    
-		b.setBounds(100,100,140, 40);    
-		//enter name label
-		JLabel label = new JLabel();		
-		label.setText("file name:");
-		label.setBounds(10, 10, 100, 100);
-		//empty label which will show event after button clicked
-		JLabel label1 = new JLabel();
-		label1.setBounds(10, 110, 200, 100);
-		//textfield to enter name
-		JTextField textfield= new JTextField();
-		textfield.setBounds(110, 50, 130, 30);
-		//add to frame
-		f.add(label1);
-		f.add(textfield);
-		f.add(label);
-		f.add(b);    
-		f.setSize(300,300);    
-		f.setLayout(null);    
-		f.setVisible(true);    
 
-		//action listener
-		b.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if(isGamer==5) {
-					getGame().toCSV("game_"+textfield.getText());
-					label1.setText("The file saved in this folder");	
-				}
-				if(isGamer==6) {
-					if(isRun==true) {
-					 new Path2KML(getPath(), "Path_"+textfield.getText());
-						label1.setText("The file saved in this folder");	
-					}
-					else {
-						label1.setText("please run first");	
-						
-
-					}
-
-				}
-				
-			}         
-		});
-
-	}         
 	// Not Used, but need to provide an empty body for compilation
 	public void mouseReleased(MouseEvent event){}
 	public void mouseClicked(MouseEvent event){}
@@ -350,18 +302,17 @@ public class MyFrame extends JFrame implements MouseListener{
 		return game;
 	}
 
-	private  ArrayList<String> read(String parentDirectory){
+	private  ArrayList<String> read(String parentDirectory,String type, String startWith){
 		File[] filesInDirectory = new File(parentDirectory).listFiles();
 		ArrayList<String> s= new ArrayList<String>();
 		for(File f : filesInDirectory){
 			if(f.isDirectory()){
-				read(f.getAbsolutePath());
+				read(f.getAbsolutePath(),type,startWith);
 			}
 			String filePath = f.getAbsolutePath();
 			String fileExtenstion = filePath.substring(filePath.lastIndexOf(".") + 1,filePath.length());
-			//String fileStart= filePath.substring(0,4);
 
-			if("csv".equals(fileExtenstion) &&filePath.contains("game")){
+			if(type.equals(fileExtenstion) &&filePath.contains(startWith)){
 				//add to a list or array
 
 				s.add(filePath);
@@ -383,16 +334,12 @@ public class MyFrame extends JFrame implements MouseListener{
 	}
 
 
-	public int getGameNum() {
-		return gameNum;
-	}
-
-
 	public Path getPath() {
 		return path;
 	}
 
 
-	
+
 
 }
+

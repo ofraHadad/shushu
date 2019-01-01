@@ -24,14 +24,14 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		//		DirectoryToKml d= new 	DirectoryToKml ();
-		//		CsvToKml r= new CsvToKml();
-		//		
-		//		//r.KmlWriter(r.read("WigleWifi_20171201110209.csv"),"moshe");
-		//	//	r.KmlWriter("WigleWifi_20171203085618.csv");
-		//	MyGisProject p= new MyGisProject();
-		//		d.multyKmlFile( d.read("data", p),"data");
-		//
+				DirectoryToKml d= new 	DirectoryToKml ();
+				CsvToKml r= new CsvToKml();
+				
+				//r.KmlWriter(r.read("WigleWifi_20171201110209.csv"),"moshe");
+			//	r.KmlWriter("WigleWifi_20171203085618.csv");
+			MyGisProject p= new MyGisProject();
+				d.multyKmlFile( d.read("data", p),"data");
+		
 		//		/*	System.out.println(l.equals(l2));
 		//	System.out.println(l);
 		//	String[] h= {"MAC","SSID","AuthMode","FirstSeen","Channel","RSSI","AccuracyMeters","Type","CurrentLatitude","CurrentLongitude","AltitudeMeters"};
@@ -60,15 +60,15 @@ public class main {
 		//			// TODO Auto-generated catch block
 		//			e1.printStackTrace();
 		//		}
-		Pixel p= new Pixel(734,552);
-		//
-		//
-		//			System.out.println(map.converteGpsToPixel(gps));
-		//
-		System.out.println(map.convertePixelToGps(p));
-		//*/
-		//	//	Game g=new Game("game_1543693911932_a.csv",map);
-		//		//System.out.println(g);
+//		Pixel p= new Pixel(734,552);
+//		//
+//		//
+//		//			System.out.println(map.converteGpsToPixel(gps));
+//		//
+//		System.out.println(map.convertePixelToGps(p));
+//		//*/
+//		//	//	Game g=new Game("game_1543693911932_a.csv",map);
+//		//		//System.out.println(g);
 		////		ShortestPathAlgo s= new ShortestPathAlgo(g);
 		////		System.out.println(s.bestPathCalculation());
 		////	d.multyKmlFile(s.bestPathCalculation(), "game");

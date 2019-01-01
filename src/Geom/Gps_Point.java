@@ -1,4 +1,5 @@
 package Geom;
+
 /**
  * @authors Shira,ofra
  *This class represents a gps point.

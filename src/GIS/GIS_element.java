@@ -14,10 +14,10 @@ public interface GIS_element {
 	public Geom_element getGeom();
 	public Meta_data getData();
 	public void translate(Point3D vec);
-	public boolean equals(GIS_element e);
+
 	/**
 	 * check which type of gis element 
-	 * @return 0- MyGisElement, 1- Fruit, 2-packman, 3-gameGPS
+	 * @return 0- MyGisElement, 1- Fruit, 2-packman
 	 */
 	public int whatAmI();
 }

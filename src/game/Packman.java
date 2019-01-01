@@ -1,5 +1,6 @@
 package game;
 
+import GIS.FruitMetaData;
 import GIS.GIS_element;
 import GIS.Meta_data;
 import GIS.PackmanMetaData;
@@ -8,7 +9,7 @@ import Geom.Gps_Point;
 import Geom.Pixel;
 import Geom.Point3D;
 
-public class Packman implements GIS_element{
+public class Packman implements GIS_element, Runnable{
 
 	private Pixel location;	
 	private Gps_Point locationGPS;
@@ -18,9 +19,9 @@ public class Packman implements GIS_element{
 
 	public Packman(int x,int y, Map map,int id) {
 		this.map= map;
-		this.location= new Pixel(x, y);
+		setLocation(new Pixel(x, y));
 		this.dataP= new PackmanMetaData(id);
-		setLocationGPS(new Gps_Point(map.convertePixelToGps(getLocation())));
+		setLocationGPS(new Gps_Point(map.convertePixelToGps(new Pixel(x, y))));
 		
 
 	}
@@ -29,7 +30,7 @@ public class Packman implements GIS_element{
 		Gps_Point gps= new Gps_Point(head,line);
 		setLocationGPS(gps);
 		this.map=map;
-		location=map.converteGpsToPixel(gps);
+		location=getMap().converteGpsToPixel(gps);
 
 		this.dataP= new PackmanMetaData(head, line);
 		
@@ -48,7 +49,7 @@ public class Packman implements GIS_element{
 	
 	public String toString() {
 		
-		return "Location: " + location + ", "+ this.dataP;
+		return "Location: " + locationGPS + ", "+ this.dataP;
 	}
 
 
@@ -61,8 +62,8 @@ public class Packman implements GIS_element{
 		return dataP;
 	}
 
-	public Pixel getLocation() {
-		return location;
+	protected Pixel getLocation() {
+		 return getMap().converteGpsToPixel(getLocationGPS());
 	}
 	
 
@@ -95,7 +96,7 @@ public class Packman implements GIS_element{
 		
 	}
 
-	public Gps_Point getLocationGPS() {
+	protected Gps_Point getLocationGPS() {
 		return locationGPS;
 	}
 
@@ -114,6 +115,13 @@ public class Packman implements GIS_element{
 
 	private void setDataP(PackmanMetaData dataP) {
 		this.dataP = dataP;
+	}
+
+	@Override
+	public void run() {
+	
+		
+		
 	}
 
 

@@ -162,7 +162,6 @@ public class CsvToKml {
 				
 				 tEnd= new Time(e.getData().getUTC());
 
-
 				ans=ans+("<Placemark>\n");
 				ans=ans+("<name>"+"<![CDATA["+data.substring(data.indexOf("Id: ")+4, data.indexOf(", Time:"))+"]]>"  +"</name>\n");
 				ans=ans+("<description>"+"<![CDATA[Grade/Weight: <b>"+data.substring(data.indexOf("Weight/Grade: ")+14,data.indexOf(", Id"))

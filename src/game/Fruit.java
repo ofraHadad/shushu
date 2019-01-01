@@ -7,29 +7,48 @@ import Geom.Geom_element;
 import Geom.Gps_Point;
 import Geom.Pixel;
 import Geom.Point3D;
+/**
+ * This class represent a fruit in the game.
+ * it's has a location in the game and in the game
+ * @author ofra&shira
+ *
+ */
 
 public class Fruit implements GIS_element{
-	private Pixel location;
+
 	private Gps_Point locationGPS;
 	private Map map;
 	private FruitMetaData dataF;
 	
-
+	//////////////////constructor's////////////////////////////////////////////
+/**
+ * Creates fruit from pixel coordinates,a map, and an id.  
+ * @param x
+ * @param y
+ * @param map
+ * @param id
+ */
 	public Fruit(int x, int y,Map map,int id) {
 		this.map= map;
-		setLocation(new Pixel(x, y));
+
 		this.dataF= new FruitMetaData(id);
-		setLocationGPS(new Gps_Point(map.convertePixelToGps(getLocation())));
+		setLocationGPS(new Gps_Point(map.convertePixelToGps((new Pixel(x, y)))));
 
 	}
 
 
-
+/**
+ * creates a fruit from arrays of String's.
+ * need's in to create a game from a CSV file.
+ * @param line
+ * @param head
+ * @param map
+ */
 	public Fruit(String[] line, String[] head,Map map) {
 
 		setLocationGPS(new Gps_Point(head,line));
 		this.map= map;
-		setLocation(map.converteGpsToPixel(getLocationGPS()));
+	
 
 		this.dataF= new FruitMetaData(head,line);
 
@@ -37,40 +56,47 @@ public class Fruit implements GIS_element{
 
 	}
 
+	/**
+	 * deep copy of fruit.
+	 * @param f
+	 */
 	public Fruit(Fruit f) {
 		setLocationGPS(new Gps_Point(f.getLocationGPS()));
 		this.map= f.map;
-		setLocation(new Pixel(f.getLocation()));
+		
 		this.dataF= new FruitMetaData(f.dataF);
 	}
 
 
-
+/////////////////////////////method's/////////////////////////////////////
+	/**
+	 * Returns the representing String of the fruit
+	 */
 	public String toString() {
-		return "Location: " + getLocation() +", "+dataF;
+		return "Location: " + getLocationGPS() +", "+dataF;
+	}
+
+/**
+ * check if the GIS_element equals the fruit
+ * @param e
+ * @return
+ */
+	public boolean equals(GIS_element e) {
+		
+		return getGeom().equals(e.getGeom()) && getData().equals(e.getData())&&(whatAmI()==e.whatAmI());
 	}
 
 
 
-
-
-	public Map getMap() {
-		return map;
-	}
-	protected FruitMetaData getDataF() {
-		return this.dataF;
-	}
-	
+//////////////////////////////////GIS_element/////////////////////////////////
 
 	@Override
 	public Geom_element getGeom() {
-		// TODO Auto-generated method stub
 		return locationGPS;
 	}
 
 	@Override
 	public Meta_data getData() {
-		// TODO Auto-generated method stub
 		return dataF;
 	}
 
@@ -85,7 +111,9 @@ public class Fruit implements GIS_element{
 		return 1;
 	}
 	
-	public Gps_Point getLocationGPS() {
+	
+	////////////////////////////////////////Getters and Setters//////////////////////////////////
+	protected Gps_Point getLocationGPS() {
 		return locationGPS;
 	}
 
@@ -95,22 +123,15 @@ public class Fruit implements GIS_element{
 
 
 
-	public Pixel getLocation() {
-		return location;
+	protected Pixel getLocation() {
+		return getMap().converteGpsToPixel(getLocationGPS());
 	}
 
-
-
-	private void setLocation(Pixel location) {
-		this.location = location;
+	protected Map getMap() {
+		return map;
 	}
-
-
-
-	@Override
-	public boolean equals(GIS_element e) {
-		// TODO Auto-generated method stub
-		return getGeom().equals(e.getGeom()) && getData().equals(e.getData())&&(whatAmI()==e.whatAmI());
+	protected FruitMetaData getDataF() {
+		return this.dataF;
 	}
 
 

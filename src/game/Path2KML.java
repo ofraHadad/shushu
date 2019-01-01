@@ -1,9 +1,12 @@
 package game;
 
-import java.io.File;
-
 import File_format.DirectoryToKml;
 
+/**
+ * take a path and represent it with a KML file.
+ * @author ofra and shira
+ *
+ */
 public class Path2KML {
 	
 	public  Path2KML(Path path, String file) {

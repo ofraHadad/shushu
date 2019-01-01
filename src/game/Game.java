@@ -12,61 +12,86 @@ import GIS.GIS_element;
 import Geom.Gps_Point;
 import Geom.Pixel;
 
-public class Game /*implements GIS_layer */{
+/**
+ * this class represent a game.
+ * it's has fruits-ArrayList of fruits,packmans- aarayList of packmans and map-where the game is played.
+ * @author ofra and shira
+ *
+ */
+public class Game {
 
 	private ArrayList<Fruit> fruits=new ArrayList<>();
 	private ArrayList<Packman> packmans=new ArrayList<>();
+	private ArrayList<Ghost> ghosts=new ArrayList<>();
+	private ArrayList<Box> boxes=new ArrayList<>();
+	
 	private Map map;
 
-
-
+	////////////////////////////////constructors///////////////////////////////////////////////
+	/**
+	 * 
+	 * @param map
+	 */
 	public Game(Map map) {
-		this.map= map; 
+		this.map= map;
+
 	}
+	/**
+	 * creates a game from a csv file
+	 * @param csvFile
+	 * @param map
+	 */
 	public Game(String csvFile, Map map) {
 		this.map= map;
-		
+
 		read(csvFile, 0, map, this);
 	}
 
+	public Game(ArrayList<String> s,Map map) {
+		this.map=map;
+		readArrayList( s, map, this);
+	}
+
+	///////////////////////////////////////////methods/////////////////////////////////////////////
 	public String toString() {
 		String ans="";
 		Iterator<Fruit> itFruits= getFruits().iterator();
 		Iterator<Packman> itPackmans= getPackmans().iterator();
+		Iterator<Ghost> itGhosts= getGhosts().iterator();
+		Iterator<Box> itBox= getBoxes().iterator();
+
+
 		while(itPackmans.hasNext()) {
 			ans= ans+"Packman: "+itPackmans.next().toString()+"\n";
 		}
 		while(itFruits.hasNext()) {
 			ans= ans+"Fruit: "+itFruits.next().toString()+"\n";
+
+		}
+		while(itGhosts.hasNext()) {
+			ans= ans+"Ghost: "+itGhosts.next().toString()+"\n";
+
+		}
+		while(itBox.hasNext()) {
+			ans= ans+"Box: "+itBox.next().toString()+"\n";
+
 		}
 		return ans;
 	}
 
-	public void synchronization(int w, int h) {
-
-		Gps_Point start= getMap().convertePixelToGps(new Pixel(0,0));
-		Gps_Point end= getMap().convertePixelToGps(new Pixel(getMap().getMyImage().getWidth(), getMap().getMyImage().getHeight()));
-
-	}
-
-	public boolean add(GIS_element e) {
-		if (e.whatAmI()==1) {
-			getFruits().add((Fruit) e);
-		}
-		if(e.whatAmI()==2) {
-			getPackmans().add((Packman) e);
-		}
-
-		return false;
-	}
-	
+	/**
+	 * write a csv file represent this game.
+	 * the same format in that you can create a game from.
+	 * @param fileName
+	 */
 	public  void toCSV(String fileName) {
+
 		FileWriter writer;
 		try {
 			writer = new FileWriter(fileName+".csv");
 			BufferedWriter bw = new BufferedWriter(writer);
 			StringBuilder sb = new StringBuilder();
-			
+
 			sb.append("Type,id,Lat,Lon,Alt,Speed/Weight,Raius,"+getPackmans().size()+","+getFruits().size()+"\n");
 			Iterator<Packman> packmans= getPackmans().iterator();
 			Iterator<Fruit> fruits=getFruits().iterator();
@@ -82,7 +107,7 @@ public class Game /*implements GIS_layer */{
 				sb.append("F,"+f.getDataF().getId()+","+location.get_y()+","+location.get_x()+
 						","+ f.getDataF().getAlt()+","+f.getDataF().getWeight()+"\n");
 			}
-		
+
 
 			bw.write(sb.toString());
 			bw.close();
@@ -90,34 +115,33 @@ public class Game /*implements GIS_layer */{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 
-		
 	}
+
+
 	private Game read(String csvFile,int firstLine, Map map, Game game) {
 
 		String line = "";
 		String cvsSplitBy = ",";
 		int column=0;
-		
 
-		
+
+
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) 
 		{
 			int count =firstLine;
-			
+
 			while (count==firstLine&&(line = br.readLine()) != null) 
 			{
 				String[] head= line.split(cvsSplitBy);
 				column= head.length;
 				count++;
-				
-				
+
+
 			}
 		}
-			
+
 		catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		String[] head= new String [column];
@@ -159,7 +183,7 @@ public class Game /*implements GIS_layer */{
 				count++;
 			}
 
-		
+
 
 		} 
 		catch (IOException e) 
@@ -168,7 +192,7 @@ public class Game /*implements GIS_layer */{
 		}
 		return game;
 	}
-	
+
 	private int serch(String[] head,String s) {
 		int index=head.length;
 		for (int i=0; i<head.length; i++) {
@@ -181,10 +205,58 @@ public class Game /*implements GIS_layer */{
 
 		return index;
 	}
+	private Game readArrayList(ArrayList<String> s,Map map, Game game) {
+		Iterator<String> it =s.iterator();
+		String line = "";
+		String title="Type,ID,Lat,Lon,Alt,Speed/Weight,Radius";
+		String cvsSplitBy = ",";
+		int column=0;
+		while(it.hasNext()) {
+			line= it.next();
+			String[] head= title.split(cvsSplitBy);
+			String[] userInfo= line.split(cvsSplitBy);
+
+			
+			int isPackman= serch(userInfo,"P");
+			int isFruit= serch(userInfo, "F");
+			int isGhost= serch(userInfo, "G");
+			int isBox= serch(userInfo, "B");
+
+			if(isPackman<userInfo.length) {
+				game.getPackmans().add(new Packman(userInfo,head,map));
+			}
+			if(isFruit<userInfo.length) {
+				game.getFruits().add(new Fruit(userInfo,head,map));
+			}
+			if(isGhost<userInfo.length) {
+				game.getGhosts().add(new Ghost(userInfo,head,map));
+			}
+			if(isBox<userInfo.length) {
+				game.getBoxes().add(new Box(userInfo,head,map));
+			}
+			
 
 
+		}
+
+
+
+
+		return game;
+	}
+
+
+	/////////////////////////Getters and Setters//////////////////////////////////////////////////
+
+
+	protected ArrayList<Ghost> getGhosts() {
+		return ghosts;
+	}
 	
-
+	protected ArrayList<Box> getBoxes() {
+		return boxes;
+	}
+	
 	
 	protected ArrayList<Fruit> getFruits() {
 		return fruits;
@@ -198,8 +270,8 @@ public class Game /*implements GIS_layer */{
 	public Map getMap() {
 		return map;
 	}
-	
-	
+
+
 
 
 }

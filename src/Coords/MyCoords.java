@@ -65,7 +65,7 @@ public class MyCoords implements coords_converter{
  * @param p1
  * @return the azimuth
  */
-	private double  azimuth(Gps_Point p0, Gps_Point p1) {
+	public double  azimuth(Gps_Point p0, Gps_Point p1) {
 		double longDiff= Point3D.d2r((p1.get_y()-p0.get_y()));
 		double p0_x_r=Point3D.d2r(p0.get_x());
 		double p1_x_r=Point3D.d2r(p1.get_x());
