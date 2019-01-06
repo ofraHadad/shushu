@@ -30,6 +30,15 @@ public class Box {
 		return "ID:";//+getId()+", min:"+getMin()+",max: "+getMax();
 	}
 	
+	public boolean onTheBoxY(double x) {
+		return(getLocation().getX()<=x && getMax().getX()>=x);
+	}
+	public boolean onTheBoxX(double y) {
+		return(getLocation().getY()<=y && getMax().getY()>=y);
+	}
+	public Pixel getMax() {
+		return new Pixel(getLocation().getX()+getWidth(), getLocation().getY()+getHetigh());
+	}
 	public int getId() {
 		return id;
 	}

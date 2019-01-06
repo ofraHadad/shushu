@@ -19,13 +19,14 @@ import Geom.Pixel;
  *
  */
 public class Game {
+	private Map map;
 
 	private ArrayList<Fruit> fruits=new ArrayList<>();
 	private ArrayList<Packman> packmans=new ArrayList<>();
 	private ArrayList<Ghost> ghosts=new ArrayList<>();
 	private ArrayList<Box> boxes=new ArrayList<>();
-	
-	private Map map;
+	private Player me; 
+
 
 	////////////////////////////////constructors///////////////////////////////////////////////
 	/**
@@ -46,12 +47,14 @@ public class Game {
 
 		read(csvFile, 0, map, this);
 	}
-
 	public Game(ArrayList<String> s,Map map) {
 		this.map=map;
-		readArrayList( s, map, this);
+
+		readArrayList( s);
 	}
 
+
+	
 	///////////////////////////////////////////methods/////////////////////////////////////////////
 	public String toString() {
 		String ans="";
@@ -205,7 +208,11 @@ public class Game {
 
 		return index;
 	}
-	private Game readArrayList(ArrayList<String> s,Map map, Game game) {
+	public void readArrayList(ArrayList<String> s) {
+		getFruits().removeAll(getFruits());
+		getPackmans().removeAll(getPackmans());
+		getGhosts().removeAll(getGhosts());
+	
 		Iterator<String> it =s.iterator();
 		String line = "";
 		String title="Type,ID,Lat,Lon,Alt,Speed/Weight,Radius";
@@ -216,33 +223,37 @@ public class Game {
 			String[] head= title.split(cvsSplitBy);
 			String[] userInfo= line.split(cvsSplitBy);
 
-			
+
 			int isPackman= serch(userInfo,"P");
 			int isFruit= serch(userInfo, "F");
 			int isGhost= serch(userInfo, "G");
 			int isBox= serch(userInfo, "B");
+			int isPlayer=serch(userInfo,"M");
 
 			if(isPackman<userInfo.length) {
-				game.getPackmans().add(new Packman(userInfo,head,map));
+				this.getPackmans().add(new Packman(userInfo,head,map));
 			}
 			if(isFruit<userInfo.length) {
-				game.getFruits().add(new Fruit(userInfo,head,map));
+				this.getFruits().add(new Fruit(userInfo,head,map));
 			}
 			if(isGhost<userInfo.length) {
-				game.getGhosts().add(new Ghost(userInfo,head,map));
+				this.getGhosts().add(new Ghost(userInfo,head,map));
 			}
 			if(isBox<userInfo.length) {
-				game.getBoxes().add(new Box(userInfo,head,map));
+				this.getBoxes().add(new Box(userInfo,head,map));
 			}
-			
-
+			if(me!=null) {
+				if(isPlayer<userInfo.length) {
+					me.setLocationGPS(new Gps_Point(head,userInfo));
+				}
+			}
 
 		}
 
 
 
 
-		return game;
+		
 	}
 
 
@@ -252,12 +263,12 @@ public class Game {
 	protected ArrayList<Ghost> getGhosts() {
 		return ghosts;
 	}
-	
+
 	protected ArrayList<Box> getBoxes() {
 		return boxes;
 	}
-	
-	
+
+
 	protected ArrayList<Fruit> getFruits() {
 		return fruits;
 	}
@@ -269,6 +280,12 @@ public class Game {
 
 	public Map getMap() {
 		return map;
+	}
+	public Player getMe() {
+		return me;
+	}
+	public void setMe(Player me) {
+		this.me = me;
 	}
 
 

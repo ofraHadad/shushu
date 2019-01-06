@@ -43,7 +43,8 @@ public class MyFrame extends JFrame implements MouseListener{
 	private boolean isRun;
 	private MenuBar menuBar;
 	public static Image scaledImage;
-	int i=1;
+	int i=0;
+	private double oldAngel;
 	MyCoords c=new MyCoords();
 
 	public MyFrame(Map map){
@@ -168,15 +169,15 @@ public class MyFrame extends JFrame implements MouseListener{
 
 	protected void paintElement() {
 		//	The method getGraphics is called to obtain a Graphics object
-
+		repaint();
 		_paper = _panel.getGraphics();
 
 		Iterator<Box> boxes= game.getBoxes().iterator();
 		Iterator<Ghost> ghosts= game.getGhosts().iterator();
 		Iterator<Fruit> fruits= game.getFruits().iterator();
-		
+
 		Iterator<Packman> packmans= game.getPackmans().iterator();
-		
+
 		while(boxes.hasNext()) {
 			_paper.setColor(Color.BLACK);
 			Box b=boxes.next();
@@ -199,10 +200,17 @@ public class MyFrame extends JFrame implements MouseListener{
 			Ghost g=ghosts.next();
 			_paper.fillOval(g.getLocation().getX()-13,g.getLocation().getY()-13,26,26);
 		}
-		
-		if(me!=null) {
+
+		if(game.getMe()!=null) {
+			//			if(isGamer==1) {
+			//			_paper.setColor(Color.PINK);
+			//			_paper.fillOval(me.getLocation().getX()-15,me.getLocation().getY()-15,30,30);
+			//			i++;
+			//			}
+			//			else {
 			_paper.setColor(Color.PINK);
-			_paper.fillOval(me.getLocation().getX()-15,me.getLocation().getY()-15,30,30);
+			_paper.fillOval(game.getMe().getLocation().getX()-15,game.getMe().getLocation().getY()-15,30,30);
+			//}
 		}
 	}
 
@@ -211,8 +219,6 @@ public class MyFrame extends JFrame implements MouseListener{
 
 
 	public void paint(Graphics g) {
-		//g.clearRect(-8, 0, map.getMyImage().getWidth(), map.getMyImage().getHeight());
-		//repaint();
 		//		scaledImage = map.getMyImage().getScaledInstance(this.getWidth()-20,this.getHeight()-60,Image.SCALE_SMOOTH);
 		//		g.drawImage(scaledImage, 10, 50, this);
 
@@ -230,21 +236,27 @@ public class MyFrame extends JFrame implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent event) {
 		if(isGamer==1&&!stop ) {
-			me= new Player(event.getX(), event.getY(),map);
-			play1.setInitLocation( me.getLocationGPS().get_y(),me.getLocationGPS().get_x());
+			game.setMe( new Player(event.getX(), event.getY(),map));
+			play1.setInitLocation( game.getMe().getLocationGPS().get_y(),game.getMe().getLocationGPS().get_x());
 
 		}
 		if(isGamer==3) {
 			Pixel pressed= new Pixel(event.getX(),event.getY());
-			Vector v= new Vector(me.getLocationGPS(),getMap().convertePixelToGps(pressed));
-			me.setLocationGPS(v.goTo(me.getLocationGPS(),20/10));
+			String s= play1.getBoundingBox();
+			String []arr= s.split(",");
+			Gps_Point up= new Gps_Point(Double.parseDouble(arr[6]),Double.parseDouble(arr[2]),0);
+			Gps_Point down= new Gps_Point(Double.parseDouble(arr[3]), Double.parseDouble(arr[5]),0);
+
+
 			play1.start();
-			
-			play1.rotate(c.azimuth(me.getLocationGPS(), getMap().convertePixelToGps(pressed)));
+
+			play1.rotate((360-c.azimuth( getMap().convertePixelToGps(pressed),game.getMe().getLocationGPS())-90)%360);
 			ArrayList<String> board_data = play1.getBoard();
-			game= new Game(board_data,getMap());
-			
-			
+			System.out.println(board_data.get(0));
+			System.out.println(board_data.get(1));
+			game.readArrayList(board_data);
+
+
 
 			String info = play1.getStatistics();
 			System.out.println(info);

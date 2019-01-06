@@ -44,7 +44,6 @@ public class FruitMetaData implements Meta_data{
 				setWeight(0);
 			}
 			else {
-				System.out.println(line[hasWeight]);
 				double speed=Double.parseDouble(line[hasWeight]);
 				setWeight((int)speed);
 			}

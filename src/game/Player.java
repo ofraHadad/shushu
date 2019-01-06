@@ -18,6 +18,16 @@ public class Player {
 	}
 
 	
+	
+	public Player(Player me) {
+		setMap(me.getMap());
+		setLocationGPS(me.getLocationGPS());
+		setRadius(me.getRadius());
+		setSpeed(me.getSpeed());
+	}
+
+
+
 	public Pixel getLocation() {
 		return getMap().converteGpsToPixel(getLocationGPS());
 	}
