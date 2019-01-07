@@ -252,8 +252,7 @@ public class MyFrame extends JFrame implements MouseListener{
 
 			play1.rotate((360-c.azimuth( getMap().convertePixelToGps(pressed),game.getMe().getLocationGPS())-90)%360);
 			ArrayList<String> board_data = play1.getBoard();
-			System.out.println(board_data.get(0));
-			System.out.println(board_data.get(1));
+			
 			game.readArrayList(board_data);
 
 
