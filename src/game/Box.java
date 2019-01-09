@@ -32,14 +32,14 @@ public class Box {
 		return "ID:";//+getId()+", min:"+getMin()+",max: "+getMax();
 	}
 	
-	public boolean onTheBoxY(double x) {
-		return(getLocation().getX()<x && getMax().getX()>x);
+	public boolean onTheBoxY(Pixel p) {
+		return(getLocation().getX()<p.getX() && getMax().getX()>p.getX());
 	}
-	public boolean onTheBoxX(double y) {
-		return(getLocation().getY()<y && getMax().getY()>y);
+	public boolean onTheBoxX(Pixel p) {
+		return(getLocation().getY()<p.getY() && getMax().getY()>p.getY());
 	}
 	public Pixel getMax() {
-		return new Pixel(getLocation().getX()+getWidth(), getLocation().getY()+getHetigh());
+		return map.converteGpsToPixel(getMaxGPS());
 	}
 	
 	public int getId() {

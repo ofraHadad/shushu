@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import Geom.Gps_Point;
 import Geom.Pixel;
 
+
 public class Kodkod {
 	private Gps_Point locationGps;
 	private ArrayList<Kodkod> connected=new ArrayList();
@@ -13,31 +14,18 @@ public class Kodkod {
 	private boolean isFruit;
 	private Map map;
 	
-	public Kodkod( Gps_Point p,boolean isFruit,Map map) {
+	
+	private int id;
+	private boolean isVisited;
+	
+	
+	public Kodkod( Gps_Point p,boolean isFruit,Map map,int id) {
 		setLocationGps(p);
 		setFruit(isFruit);
 		this.map= map;
+		setId(id);
 	}
 	
-//	public double bestPath(double dis , Gps_Point f,Kodkod k) {
-//		
-////		for(int i=0; i<k.getConnected().size(); i++){
-////			if(!k.getConnected().get(i).isFruit){
-////				read(f.getAbsolutePath(),type,startWith);
-////			}
-////			String filePath = f.getAbsolutePath();
-////			String fileExtenstion = filePath.substring(filePath.lastIndexOf(".") + 1,filePath.length());
-////
-////			if(type.equals(fileExtenstion) &&filePath.contains(startWith)){
-////				//add to a list or array
-////
-////				s.add(filePath);
-////			}
-////
-////		} 
-////
-////		return s;
-//	}
 
 	public Gps_Point getLocationGps() {
 		return locationGps;
@@ -74,4 +62,24 @@ public class Kodkod {
 	public Pixel getLocation() {
 		return map.converteGpsToPixel(getLocationGps());
 	}
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	public boolean isVisited() {
+		return isVisited;
+	}
+
+
+	public void setVisited(boolean isVisited) {
+		this.isVisited = isVisited;
+	}
+
+
+
+
 }

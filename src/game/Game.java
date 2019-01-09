@@ -260,11 +260,11 @@ public class Game {
 	/////////////////////////Getters and Setters//////////////////////////////////////////////////
 
 
-	protected ArrayList<Ghost> getGhosts() {
+	public ArrayList<Ghost> getGhosts() {
 		return ghosts;
 	}
 
-	protected ArrayList<Box> getBoxes() {
+	public ArrayList<Box> getBoxes() {
 		return boxes;
 	}
 
