@@ -33,10 +33,10 @@ public class Box {
 	}
 	
 	public boolean onTheBoxY(Pixel p) {
-		return(getLocation().getX()<p.getX() && getMax().getX()>p.getX());
+		return(getLocation().getX()+1<p.getX() && getMax().getX()-1>p.getX());
 	}
 	public boolean onTheBoxX(Pixel p) {
-		return(getLocation().getY()<p.getY() && getMax().getY()>p.getY());
+		return(getLocation().getY()+1<p.getY() && getMax().getY()-1>p.getY());
 	}
 	public Pixel getMax() {
 		return map.converteGpsToPixel(getMaxGPS());

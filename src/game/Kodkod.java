@@ -10,18 +10,17 @@ import Geom.Pixel;
 public class Kodkod {
 	private Gps_Point locationGps;
 	private ArrayList<Kodkod> connected=new ArrayList();
-	private double distance;
-	private boolean isFruit;
+	
+	private int whoAmI;//1-box, 2- fruit, 3- me, 4- packman
 	private Map map;
-	
-	
+
 	private int id;
 	private boolean isVisited;
 	
 	
-	public Kodkod( Gps_Point p,boolean isFruit,Map map,int id) {
+	public Kodkod( Gps_Point p,int whoAmI,Map map,int id) {
 		setLocationGps(p);
-		setFruit(isFruit);
+		setWhoAmI(whoAmI);
 		this.map= map;
 		setId(id);
 	}
@@ -43,22 +42,19 @@ public class Kodkod {
 		this.connected = connected;
 	}
 
-	public double getDistance() {
-		return distance;
-	}
-
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-
-	public boolean isFruit() {
-		return isFruit;
-	}
-
-	public void setFruit(boolean isFruit) {
-		this.isFruit = isFruit;
-	}
 	
+
+	
+	public int getWhoAmI() {
+		return whoAmI;
+	}
+
+
+	public void setWhoAmI(int whoAmI) {
+		this.whoAmI = whoAmI;
+	}
+
+
 	public Pixel getLocation() {
 		return map.converteGpsToPixel(getLocationGps());
 	}

@@ -1,5 +1,3 @@
-
-
 package game;
 
 import java.awt.*;
@@ -84,7 +82,7 @@ public class MyFrame extends JFrame implements MouseListener{
 		// A menu-bar contains menus. A menu contains menu-items (or sub-Menu)
 		// the menu-bar
 		Menu menu, menu2,kml,csv,clearGame;         // each menu in the menu-bar
-		MenuItem fruit,run,save,clear; // an item in a menu
+		MenuItem fruit,run,save,clear,algo; // an item in a menu
 		menuBar = new MenuBar();
 
 		clearGame= new Menu("clear game");
@@ -146,6 +144,18 @@ public class MyFrame extends JFrame implements MouseListener{
 				isGamer=3;
 				isRun=true;
 
+			}
+		});
+		algo= new MenuItem("algoRun");
+		menu2.add(algo);
+		algo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				repaint();
+				isGamer=6;
+				isRun=true;
+				
 			}
 		});
 
@@ -261,6 +271,10 @@ public class MyFrame extends JFrame implements MouseListener{
 			System.out.println(info);
 		}
 
+		if(isGamer == 6) {
+			Algo a= new Algo(play1,game);
+			a.algo();
+		}
 
 		repaint();
 
@@ -353,4 +367,3 @@ public class MyFrame extends JFrame implements MouseListener{
 
 
 }
-

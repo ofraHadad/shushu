@@ -2,7 +2,7 @@ package Geom;
 
 public class Line {
 
-	private float m,n;
+	private double m,n;
 	private Pixel p1,p2;
 	boolean flag=true;
 	
@@ -14,8 +14,8 @@ public class Line {
 				flag=false;
 		}
 		else {
-		setM((float)(p1.getY()-p2.getY())/(p1.getX()-p2.getX()));
-		setN((float)(p1.getY()-(getM()*p1.getX())));
+		setM((double)(p1.getY()-p2.getY())/(p1.getX()-p2.getX()));
+		setN((double)(p1.getY()-(getM()*p1.getX())));
 		}
 		
 	}
@@ -52,19 +52,19 @@ public class Line {
 		return Math.sqrt(Math.pow(y1-y2, 2)+Math.pow(x1-x2, 2));
 	}
 
-	public float getM() {
+	public double getM() {
 		return m;
 	}
 
-	public void setM(float m) {
+	public void setM(double m) {
 		this.m = m;
 	}
 
-	public float getN() {
+	public double getN() {
 		return n;
 	}
 
-	public void setN(float n) {
+	public void setN(double n) {
 		this.n = n;
 	}
 

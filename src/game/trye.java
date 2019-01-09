@@ -1,27 +1,25 @@
 package game;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import Coords.MyCoords;
 import Geom.Gps_Point;
 import Geom.Line;
 import Geom.Pixel;
 
-
-public class Graph {
-	private ArrayList<Kodkod> graph= new ArrayList<Kodkod>();
+public class trye {
+	private ArrayList<Kodkod> graph= new ArrayList();
 	private MyCoords c= new MyCoords();
 	private Game game;
 	private int id=0;
 
-	public Graph(Game game) {
+	public trye(Game game) {
 		this.game=game;
 		insertGraph();
 	}
 	private void insertGraph() {
 		Iterator<Box> boxes= getGame().getBoxes().iterator();
-		graph.add(new Kodkod(game.getMe().getLocationGPS(),3,game.getMap(),id++));
 		while (boxes.hasNext()) {
 			Box b= boxes.next();
 			graph.add(new Kodkod(new Gps_Point(b.getLocationGPS()),1,getGame().getMap(),id++));
@@ -31,9 +29,6 @@ public class Graph {
 		}
 		for(Fruit i : game.getFruits()) {
 			graph.add(new Kodkod(i.getLocationGPS(),2,game.getMap(),id++));
-		}
-		for(Packman i: game.getPackmans()) {
-			graph.add(new Kodkod(i.getLocationGPS(),4,game.getMap(),id++));
 		}
 
 		Iterator<Kodkod> boxesI=graph.iterator();
@@ -51,86 +46,61 @@ public class Graph {
 				Kodkod j= boxesJ.next();
 
 				if(isLegal(i.getLocation(), j.getLocation())) {
-				i.getConnected().add(j);
-					if(j.getWhoAmI()==1 && i.getWhoAmI()!=3) {
+					
+					i.getConnected().add(j);
+					if(j.getWhoAmI()!=2) {
 						j.getConnected().add(i);
 					}
 				}
 
 			}
-
+			
 			count++;
 		}
 	}
-/**
- * we used the code from: https://www.geeksforgeeks.org/find-paths-given-source-destination/
- * @param s
- * @param d
- * @param minPathList
- * @return
- */
-	public GpsPath bestPath(int s, int d, GpsPath minPathList) 
+
+	public void bestPath(int s, int d) 
 	{ 
-		GpsPath pathList= new GpsPath();
+		//boolean[] isVisited = new boolean[getGraph().size()]; 
+		ArrayList<Integer> pathList = new ArrayList<>(); 
+
 		//add source to path[] 
-		pathList.getPath().add(s); 
+		pathList.add(s); 
 
 		//Call recursive utility 
-		bestPathUtil(s, d,pathList,minPathList,0); 
-		
-		return minPathList;
+		bestPathUtil(s, d,pathList); 
 	} 
 
 
-	private void bestPathUtil(Integer s, int d,  GpsPath localPathList,GpsPath MinlocalPathList, int count) { 
+	private void bestPathUtil(Integer s, int d,  ArrayList<Integer> localPathList) { 
 
 		// Mark the current node 
 		graph.get(s).setVisited(true);
 
 		if (s.equals(d)) 
 		{ 
-			System.out.println(MinlocalPathList.getDis());
-			if(count==0) {
-				MinlocalPathList.getPath().clear();
-				for(Integer i: localPathList.getPath()) {
-					MinlocalPathList.getPath().add(i);
-				}
-			}
-			localPathList.setDis(distance(localPathList.getPath()));
-			MinlocalPathList.setDis(distance(MinlocalPathList.getPath()));
-
-			if(MinlocalPathList.getDis()>localPathList.getDis()) {
-
-				MinlocalPathList.getPath().clear();
-				for(Integer i: localPathList.getPath()) {
-					MinlocalPathList.getPath().add(i);
-				}
-			}
-
+			System.out.println(localPathList); 
+			// if match found then no need to traverse more till depth 
 			graph.get(s).setVisited(false);
-
 			return ; 
 		} 
 
 		// Recur for all the vertices 
 		// adjacent to current vertex 
+		//	for (Integer i=0; i< graph.get(s).getConnected().size();i++) 
 		for(Kodkod k: graph.get(s).getConnected())
 		{ 
-			//System.out.println(k.getId()+"g"+s);
 			if (!k.isVisited() ) 
 			{ 
 				// store current node 
 				// in path[] 
-				//System.out.println(k.getId());
-				//dis= dis+k.getDistance();
-				localPathList.getPath().add(k.getId()); 
-				bestPathUtil(k.getId(), d,localPathList,MinlocalPathList,count++); 
+
+				localPathList.add(k.getId()); 
+				bestPathUtil(k.getId(), d,localPathList); 
 
 				// remove current node 
 				// in path[] 
-				localPathList.getPath().remove((Object)k.getId()); 
-				//dis= dis-k.getDistance();
-
+				localPathList.remove((Object)k.getId()); 
 			} 
 		} 
 
@@ -138,21 +108,12 @@ public class Graph {
 		graph.get(s).setVisited(true); 
 	} 
 
-	public Kodkod search(int id) {
-		for(Kodkod k: graph) {
-			if(k.getId()==id) {
-				return k;
-			}
-		}
-		return null;
-	}
 
-
-	private
-
-	boolean isLegal(Pixel p1, Pixel p2) {
+	public boolean isLegal(Pixel p1, Pixel p2) {
 		Iterator <Box> boxes= game.getBoxes().iterator();
+		
 		Line l= new Line(p1,p2);
+		
 		while(boxes.hasNext()) {
 			Box b= boxes.next();
 			if(	(l.onTheKeta(l.cutX(b.getLocation().getX())) && b.onTheBoxX(l.cutX(b.getLocation().getX())))
@@ -165,14 +126,6 @@ public class Graph {
 
 		}
 		return true;
-	}
-	private double distance( ArrayList<Integer> path) {
-		double dis=0;
-		for(int i=0; i<path.size()-1; i++) {
-
-			dis=dis+c.distance3d(search(path.get(i)).getLocationGps(),search(path.get(i+1)).getLocationGps());
-		}
-		return dis;
 	}
 
 	public ArrayList<Kodkod> getGraph() {
@@ -195,4 +148,3 @@ public class Graph {
 	}
 
 }
-
