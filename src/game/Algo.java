@@ -31,17 +31,18 @@ public class Algo {
 	}
 
 	public void algo() {
-		//System.out.println(game.getFruits());
+		System.out.println(game.getFruits());
 		ArrayList<Integer> path= computPath().getPath();
-		System.out.println(computPath().getPath());
-		for(int i=0; i<path.size()-1; i++) {
+		for(int i=1; i<path.size(); i++) {
 			Kodkod kodkod=getGraph().search(path.get(i));
 			while(getGraph().search(path.get(path.size()-1))!=null &&
 					! game.getMe().getLocationGPS().equals(kodkod.getLocationGps())){
+				System.out.println(game.getMe().getLocationGPS());
 
 				play.rotate((360-c.azimuth( game.getMe().getLocationGPS(),
 						kodkod.getLocationGps())-90)%360);
 				game.readArrayList(play.getBoard());
+				System.out.println(play.getBoard());
 				graph= new Graph(game);
 			}
 			if(getGraph().search(path.get(path.size()-1))==null) {
@@ -52,14 +53,19 @@ public class Algo {
 
 
 
-	private GpsPath computPath() {
+	public GpsPath computPath() {
 		double min=-1;
 		GpsPath path= new GpsPath();
 		GpsPath minPath= new GpsPath();
 		for( Kodkod k :getGraph().getGraph() ) {
 			if(k.getWhoAmI()==2) {
-				path=bestWay(k.getId());
+				System.out.println(k.getId());
+				System.out.println(path.getDis());
+				path.getPath().clear();
+				path.setDis(0);
+				path.setDis(graph.bestPath(0,k.getId(), path).getDis());
 				if(path.getDis()<min || min==-1) {
+					System.out.println(1);
 					min=path.getDis();
 					minPath.getPath().clear();
 					for(Integer i : path.getPath()) {
@@ -107,11 +113,11 @@ public class Algo {
 //		return p;
 //	}
 
-	private GpsPath bestWay(int id) {
-		GpsPath path= new GpsPath();
-		System.out.println(getGraph().bestPath(1, id, path).getPath());
-		return getGraph().bestPath(1, id, path);
-	}
+//	private GpsPath bestWay(int id) {
+//		GpsPath path= new GpsPath();
+//		//System.out.println(getGraph().bestPath(1, id, path).getPath());
+//		return getGraph().bestPath(1, id, path);
+//	}
 
 	private boolean isLegal(Pixel p1, Pixel p2) {
 		Iterator <Box> boxes= game.getBoxes().iterator();

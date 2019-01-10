@@ -52,9 +52,9 @@ public class Graph {
 
 				if(isLegal(i.getLocation(), j.getLocation())) {
 				i.getConnected().add(j);
-					if(j.getWhoAmI()==1 && i.getWhoAmI()!=3) {
+					
 						j.getConnected().add(i);
-					}
+					
 				}
 
 			}
@@ -78,6 +78,9 @@ public class Graph {
 		//Call recursive utility 
 		bestPathUtil(s, d,pathList,minPathList,0); 
 		
+		for(Kodkod k: graph) {
+			k.setVisited(false);
+		}
 		return minPathList;
 	} 
 
@@ -89,9 +92,9 @@ public class Graph {
 
 		if (s.equals(d)) 
 		{ 
-			System.out.println(MinlocalPathList.getDis());
-			if(count==0) {
-				MinlocalPathList.getPath().clear();
+			
+			if(	MinlocalPathList.getPath().isEmpty()) {
+				
 				for(Integer i: localPathList.getPath()) {
 					MinlocalPathList.getPath().add(i);
 				}

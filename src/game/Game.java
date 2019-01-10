@@ -212,6 +212,7 @@ public class Game {
 		getFruits().removeAll(getFruits());
 		getPackmans().removeAll(getPackmans());
 		getGhosts().removeAll(getGhosts());
+		getBoxes().clear();
 	
 		Iterator<String> it =s.iterator();
 		String line = "";
