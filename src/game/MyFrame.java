@@ -35,14 +35,13 @@ public class MyFrame extends JFrame implements MouseListener{
 	private int id=1;
 	private boolean stop;
 	public GameBoard v;
-	private Player me;
+
 	private Path path;
 	private Play play1;
 	private boolean isRun;
 	private MenuBar menuBar;
 	public static Image scaledImage;
 	int i=0;
-	private double oldAngel;
 	MyCoords c=new MyCoords();
 
 	public MyFrame(Map map){
@@ -62,6 +61,8 @@ public class MyFrame extends JFrame implements MouseListener{
 		createGui();
 		setVisible(true);
 		setResizable(false);
+
+
 
 	}
 
@@ -95,7 +96,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			public void actionPerformed(ActionEvent e) {
 				repaint();
 				game= new Game(getMap());
-				me=null;
+
 			}
 		});
 
@@ -140,22 +141,24 @@ public class MyFrame extends JFrame implements MouseListener{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				repaint();
 				isGamer=3;
+
+				repaint();
 				isRun=true;
+				play1.start();
 
 			}
 		});
 		algo= new MenuItem("algoRun");
 		menu2.add(algo);
 		algo.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				repaint();
 				isGamer=6;
 				isRun=true;
-				
+
 			}
 		});
 
@@ -193,6 +196,20 @@ public class MyFrame extends JFrame implements MouseListener{
 			Box b=boxes.next();
 			_paper.fillRect(b.getLocation().getX(), b.getLocation().getY(), b.getWidth(), b.getHetigh());
 		}
+
+
+		while(ghosts.hasNext()) {
+			_paper.setColor(Color.GREEN);
+			Ghost g=ghosts.next();
+			_paper.fillOval(g.getLocation().getX()-13,g.getLocation().getY()-13,26,26);
+		}
+
+		if(game.getMe()!=null) {
+			
+			_paper.setColor(Color.PINK);
+			_paper.fillOval(game.getMe().getLocation().getX()-15,game.getMe().getLocation().getY()-15,30,30);
+			
+		}
 		while(packmans.hasNext()) {
 			_paper.setColor(Color.yellow);
 			Packman p=packmans.next();
@@ -204,23 +221,6 @@ public class MyFrame extends JFrame implements MouseListener{
 			Fruit f=fruits.next();
 			_paper.fillOval(f.getLocation().getX()-5,f.getLocation().getY()-5,10,10);
 
-		}
-		while(ghosts.hasNext()) {
-			_paper.setColor(Color.GREEN);
-			Ghost g=ghosts.next();
-			_paper.fillOval(g.getLocation().getX()-13,g.getLocation().getY()-13,26,26);
-		}
-
-		if(game.getMe()!=null) {
-			//			if(isGamer==1) {
-			//			_paper.setColor(Color.PINK);
-			//			_paper.fillOval(me.getLocation().getX()-15,me.getLocation().getY()-15,30,30);
-			//			i++;
-			//			}
-			//			else {
-			_paper.setColor(Color.PINK);
-			_paper.fillOval(game.getMe().getLocation().getX()-15,game.getMe().getLocation().getY()-15,30,30);
-			//}
 		}
 	}
 
@@ -252,17 +252,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		}
 		if(isGamer==3) {
 			Pixel pressed= new Pixel(event.getX(),event.getY());
-			String s= play1.getBoundingBox();
-			String []arr= s.split(",");
-			Gps_Point up= new Gps_Point(Double.parseDouble(arr[6]),Double.parseDouble(arr[2]),0);
-			Gps_Point down= new Gps_Point(Double.parseDouble(arr[3]), Double.parseDouble(arr[5]),0);
-
-
-			play1.start();
 
 			play1.rotate((360-c.azimuth( getMap().convertePixelToGps(pressed),game.getMe().getLocationGPS())-90)%360);
 			ArrayList<String> board_data = play1.getBoard();
-			
+
 			game.readArrayList(board_data);
 
 

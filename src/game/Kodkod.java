@@ -10,21 +10,23 @@ import Geom.Pixel;
 public class Kodkod {
 	private Gps_Point locationGps;
 	private ArrayList<Kodkod> connected=new ArrayList();
-	
+
 	private int whoAmI;//1-box, 2- fruit, 3- me, 4- packman
 	private Map map;
-
 	private int id;
+	private int boazId;
 	private boolean isVisited;
-	
-	
-	public Kodkod( Gps_Point p,int whoAmI,Map map,int id) {
+	private boolean dead;
+
+
+	public Kodkod( Gps_Point p,int whoAmI,Map map,int id,int boazId) {
 		setLocationGps(p);
 		setWhoAmI(whoAmI);
 		this.map= map;
 		setId(id);
+		setBoazId(boazId);
 	}
-	
+
 
 	public Gps_Point getLocationGps() {
 		return locationGps;
@@ -42,9 +44,9 @@ public class Kodkod {
 		this.connected = connected;
 	}
 
-	
 
-	
+
+
 	public int getWhoAmI() {
 		return whoAmI;
 	}
@@ -76,6 +78,32 @@ public class Kodkod {
 	}
 
 
+	public int getBoazId() {
+		return boazId;
+	}
 
+
+	public void setBoazId(int boazId) {
+		this.boazId = boazId;
+	}
+
+
+	public boolean isDead() {
+		return dead;
+	}
+
+
+	public void setDead(boolean dead) {
+		this.dead = dead;
+	}
+	
 
 }
+
+
+	
+
+
+
+
+

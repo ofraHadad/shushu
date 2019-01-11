@@ -31,19 +31,21 @@ public class Algo {
 	}
 
 	public void algo() {
+		
 		System.out.println(game.getFruits());
 		ArrayList<Integer> path= computPath().getPath();
 		for(int i=1; i<path.size(); i++) {
 			Kodkod kodkod=getGraph().search(path.get(i));
-			while(getGraph().search(path.get(path.size()-1))!=null &&
+			while(!getGraph().search(path.get(path.size()-1)).isDead() &&
 					! game.getMe().getLocationGPS().equals(kodkod.getLocationGps())){
-				System.out.println(game.getMe().getLocationGPS());
 
 				play.rotate((360-c.azimuth( game.getMe().getLocationGPS(),
 						kodkod.getLocationGps())-90)%360);
-				game.readArrayList(play.getBoard());
-				System.out.println(play.getBoard());
-				graph= new Graph(game);
+			
+				graph.getGame().readArrayList(play.getBoard());
+			
+				graph.reinsert();
+				
 			}
 			if(getGraph().search(path.get(path.size()-1))==null) {
 				algo();
@@ -58,9 +60,8 @@ public class Algo {
 		GpsPath path= new GpsPath();
 		GpsPath minPath= new GpsPath();
 		for( Kodkod k :getGraph().getGraph() ) {
-			if(k.getWhoAmI()==2) {
-				System.out.println(k.getId());
-				System.out.println(path.getDis());
+			if(k.getWhoAmI()==2 && !k.isDead()) {
+				
 				path.getPath().clear();
 				path.setDis(0);
 				path.setDis(graph.bestPath(0,k.getId(), path).getDis());
@@ -78,65 +79,9 @@ public class Algo {
 	return minPath;
 	}
 	
-//		GpsPath p= new GpsPath();
-//		Iterator<Kodkod> fruits= getGraph().getGraph().iterator();
-//		while(fruits.hasNext()) {
-//			System.out.println(p.getPath());
-//			Kodkod k= fruits.next();
-//			Kodkod f=k;
-//			if(k.getWhoAmI()==2) {
-//				f= k;
-//
-//			}
-//			else {
-//
-//				while(fruits.hasNext()) {
-//					if(k.getWhoAmI()!=2) {
-//						f=fruits.next();
-//					}
-//					else {
-//						break;
-//					}
-//				}
-//
-//			}
-//			if(min==-1) {
-//				p=bestWay(f.getId());
-//				min= p.getDis();
-//			}
-//			if(min>bestWay(f.getId()).getDis()) {
-//				p=bestWay(f.getId());
-//				min= p.getDis();
-//			}
-//
-//		}
-//		return p;
-//	}
-
-//	private GpsPath bestWay(int id) {
-//		GpsPath path= new GpsPath();
-//		//System.out.println(getGraph().bestPath(1, id, path).getPath());
-//		return getGraph().bestPath(1, id, path);
-//	}
-
-	private boolean isLegal(Pixel p1, Pixel p2) {
-		Iterator <Box> boxes= game.getBoxes().iterator();
-		Line l= new Line(p1,p2);
-		while(boxes.hasNext()) {
-			Box b= boxes.next();
-			if(	(l.onTheKeta(l.cutX(b.getLocation().getX())) && b.onTheBoxX(l.cutX(b.getLocation().getX())))
-					|| (l.onTheKeta(l.cutX(b.getMax().getX())) && b.onTheBoxX(l.cutX(b.getMax().getX())))
-					|| (l.onTheKeta(l.cutY(b.getLocation().getY())) && b.onTheBoxY(l.cutY(b.getLocation().getY())))
-					||(l.onTheKeta(l.cutY(b.getMax().getY())) && b.onTheBoxY(l.cutY(b.getMax().getY()))))
-			{
-				return false;
-			}
-
-		}
-		return true;
-	}
 
 
+	
 	public Game getGame() {
 		return game;
 	}

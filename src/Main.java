@@ -59,18 +59,18 @@ public class Main {
 		Play play1= new Play("data/Ex4_OOP_example5.csv");	
 		Game game= new Game(play1.getBoard(),new Map());
 		Map map=new Map();
-		System.out.println(play1.getBoard().get(0));
+	//	System.out.println(play1.getBoard().get(0));
 		game.setMe( new Player(766, 98,new Map()));
 		play1.setInitLocation( game.getMe().getLocationGPS().get_y(),game.getMe().getLocationGPS().get_x());
-		System.out.println((game.getBoxes().get(0).getLocation()));
+		//System.out.println((game.getBoxes().get(0).getLocation()));
 		game.readArrayList(play1.getBoard());
 		Algo a= new Algo(play1,game);
 		a.algo();
-		System.out.println(a.computPath().getPath());
-		Graph g= new Graph(game);
-		for(int i=0; i<g.getGraph().size();i++) {
-		System.out.println(g.getGraph().get(i).getId()+"ggg"+g.getGraph().get(i).getWhoAmI());
-	}
+	
+//		Graph g= new Graph(game);
+//		for(int i=0; i<g.getGraph().size();i++) {
+//		//System.out.println(g.getGraph().get(i).getId()+"ggg"+g.getGraph().get(i).getWhoAmI());
+//	}
 //		GpsPath  a= new GpsPath();
 //		System.out.println(g.bestPath(5,12,a).getPath());
 //		a.getPath().clear();

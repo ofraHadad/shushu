@@ -21,19 +21,19 @@ public class Graph {
 	}
 	private void insertGraph() {
 		Iterator<Box> boxes= getGame().getBoxes().iterator();
-		graph.add(new Kodkod(game.getMe().getLocationGPS(),3,game.getMap(),id++));
+		graph.add(new Kodkod(game.getMe().getLocationGPS(),3,game.getMap(),id++,0));
 		while (boxes.hasNext()) {
 			Box b= boxes.next();
-			graph.add(new Kodkod(new Gps_Point(b.getLocationGPS()),1,getGame().getMap(),id++));
-			graph.add(new Kodkod(new Gps_Point(b.getLocationGPS().get_x(),b.getMaxGPS().get_y(),0),1,getGame().getMap(),id++));
-			graph.add(new Kodkod(new Gps_Point(b.getMaxGPS().get_x(),b.getLocationGPS().get_y(),0),1,getGame().getMap(),id++));
-			graph.add(new Kodkod(new Gps_Point(b.getMaxGPS()),1,getGame().getMap(),id++));
+			graph.add(new Kodkod(new Gps_Point(b.getLocationGPS()),1,getGame().getMap(),id++,b.getId()));
+			graph.add(new Kodkod(new Gps_Point(b.getLocationGPS().get_x(),b.getMaxGPS().get_y(),0),1,getGame().getMap(),id++,b.getId()));
+			graph.add(new Kodkod(new Gps_Point(b.getMaxGPS().get_x(),b.getLocationGPS().get_y(),0),1,getGame().getMap(),id++,b.getId()));
+			graph.add(new Kodkod(new Gps_Point(b.getMaxGPS()),1,getGame().getMap(),id++,b.getId()));
 		}
 		for(Fruit i : game.getFruits()) {
-			graph.add(new Kodkod(i.getLocationGPS(),2,game.getMap(),id++));
+			graph.add(new Kodkod(i.getLocationGPS(),2,game.getMap(),id++,i.getDataF().getId()));
 		}
 		for(Packman i: game.getPackmans()) {
-			graph.add(new Kodkod(i.getLocationGPS(),4,game.getMap(),id++));
+			graph.add(new Kodkod(i.getLocationGPS(),4,game.getMap(),id++,i.getDataP().getId()));
 		}
 
 		Iterator<Kodkod> boxesI=graph.iterator();
@@ -51,10 +51,10 @@ public class Graph {
 				Kodkod j= boxesJ.next();
 
 				if(isLegal(i.getLocation(), j.getLocation())) {
-				i.getConnected().add(j);
-					
-						j.getConnected().add(i);
-					
+					i.getConnected().add(j);
+
+					j.getConnected().add(i);
+
 				}
 
 			}
@@ -62,13 +62,42 @@ public class Graph {
 			count++;
 		}
 	}
-/**
- * we used the code from: https://www.geeksforgeeks.org/find-paths-given-source-destination/
- * @param s
- * @param d
- * @param minPathList
- * @return
- */
+	public void reinsert() {
+
+		for(Kodkod k: getGraph()) {
+			if(k.getWhoAmI()==2) {
+				k.setDead(true);
+				for(Fruit f: getGame().getFruits()) {
+					if(k.getBoazId()==f.getDataF().getId()) {
+						k.setDead(false);
+						break;
+					}
+				}	
+				
+			}
+			if(k.getWhoAmI()==3) {
+				k.setLocationGps(game.getMe().getLocationGPS());
+			}
+			if(k.getWhoAmI()==4) {
+
+				for(Packman p: game.getPackmans()) {
+					if(k.getBoazId()==p.getDataP().getId()) {
+						k.setLocationGps(p.getLocationGPS());
+						break;
+					}
+				}
+
+
+			}
+		}
+	}
+	/**
+	 * we used the code from: https://www.geeksforgeeks.org/find-paths-given-source-destination/
+	 * @param s
+	 * @param d
+	 * @param minPathList
+	 * @return
+	 */
 	public GpsPath bestPath(int s, int d, GpsPath minPathList) 
 	{ 
 		GpsPath pathList= new GpsPath();
@@ -77,7 +106,7 @@ public class Graph {
 
 		//Call recursive utility 
 		bestPathUtil(s, d,pathList,minPathList,0); 
-		
+
 		for(Kodkod k: graph) {
 			k.setVisited(false);
 		}
@@ -92,9 +121,9 @@ public class Graph {
 
 		if (s.equals(d)) 
 		{ 
-			
+
 			if(	MinlocalPathList.getPath().isEmpty()) {
-				
+
 				for(Integer i: localPathList.getPath()) {
 					MinlocalPathList.getPath().add(i);
 				}
@@ -198,4 +227,3 @@ public class Graph {
 	}
 
 }
-
