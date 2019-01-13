@@ -34,14 +34,16 @@ public class MyFrame extends JFrame implements MouseListener{
 	private Game game;
 	private int id=1;
 	private boolean stop;
-	public GameBoard v;
+	private Timer timer;
 
 	private Path path;
 	private Play play1;
 	private boolean isRun;
 	private MenuBar menuBar;
 	public static Image scaledImage;
-	int i=0;
+
+	
+	Algo a;
 	MyCoords c=new MyCoords();
 
 	public MyFrame(Map map){
@@ -155,10 +157,28 @@ public class MyFrame extends JFrame implements MouseListener{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				isGamer=9;
 				repaint();
-				isGamer=6;
-				isRun=true;
-
+				
+				
+				
+//				timer= new Timer(100,new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(ActionEvent arg0) {
+//						repaint();
+//
+//						a= new Algo(play1,game);
+//						
+//						isGamer=9;
+//			
+//					}
+//				});
+//				
+//
+//timer.start();
 			}
 		});
 
@@ -205,10 +225,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		}
 
 		if(game.getMe()!=null) {
-			
+
 			_paper.setColor(Color.PINK);
 			_paper.fillOval(game.getMe().getLocation().getX()-15,game.getMe().getLocation().getY()-15,30,30);
-			
+
 		}
 		while(packmans.hasNext()) {
 			_paper.setColor(Color.yellow);
@@ -248,33 +268,36 @@ public class MyFrame extends JFrame implements MouseListener{
 		if(isGamer==1&&!stop ) {
 			game.setMe( new Player(event.getX(), event.getY(),map));
 			play1.setInitLocation( game.getMe().getLocationGPS().get_y(),game.getMe().getLocationGPS().get_x());
+			repaint();
 
 		}
 		if(isGamer==3) {
 			Pixel pressed= new Pixel(event.getX(),event.getY());
+			if(play1.isRuning()) {
+				play1.rotate((360-c.azimuth( getMap().convertePixelToGps(pressed),game.getMe().getLocationGPS())-90)%360);
+				ArrayList<String> board_data = play1.getBoard();
 
-			play1.rotate((360-c.azimuth( getMap().convertePixelToGps(pressed),game.getMe().getLocationGPS())-90)%360);
-			ArrayList<String> board_data = play1.getBoard();
+				game.readArrayList(board_data);
+				repaint();
 
-			game.readArrayList(board_data);
-
-
-
+			}
+			else {
+				String info = play1.getStatistics();
+				System.out.println(info);
+				isGamer=10;
+			}
+			
+			
+		}
+		if(isGamer==9) {
+			
+			a= new Algo(play1,game,this);
+			System.out.println(4);
 			String info = play1.getStatistics();
 			System.out.println(info);
-		}
-
-		if(isGamer == 6) {
-			Algo a= new Algo(play1,game);
 			a.algo();
+			repaint();
 		}
-
-		repaint();
-
-
-
-
-
 
 	}
 

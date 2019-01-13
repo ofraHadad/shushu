@@ -1,4 +1,4 @@
-//package game;
+
 
 package game;
 
@@ -11,7 +11,10 @@ import javax.imageio.ImageIO;
 import Geom.Gps_Point;
 import Geom.Pixel;
 
-
+/**
+ * This class represent a map.
+ * @author ofra&shira
+ */
 public class Map {
 
 	private BufferedImage myImage;

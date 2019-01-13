@@ -1,6 +1,6 @@
 package game;
 
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,6 +14,8 @@ import Geom.Gps_Point;
 import Geom.Line;
 import Geom.Pixel;
 import Robot.Play;
+import Threads.myThread;
+
 
 
 public class Algo {
@@ -22,66 +24,112 @@ public class Algo {
 	private Game game;
 	Graph graph;
 	MyCoords c= new MyCoords();
+	ArrayList<Double> p= new ArrayList<Double>();
+	MyFrame mf;
 
-	public Algo(Play p,Game game) {
+	public Algo(Play p,Game game,MyFrame mf) {
 		this.play= p;		
 		this.game= game;		
 		graph= new Graph(this.game);
 		play.start();
+		this.mf=mf;
 	}
 
 	public void algo() {
-		
-		System.out.println(game.getFruits());
+		if(game.getFruits().size()==0) {
+			play.rotate(0);
+		}
+		if(!play.isRuning()) {
+			System.out.println(play.getStatistics());
+			return ;
+
+		}
+
+
+		//System.out.println(game.getFruits());
+		//System.out.println(graph.getGame().getMe().getLocationGPS());
 		ArrayList<Integer> path= computPath().getPath();
+		System.out.println(path);
 		for(int i=1; i<path.size(); i++) {
 			Kodkod kodkod=getGraph().search(path.get(i));
-			while(!getGraph().search(path.get(path.size()-1)).isDead() &&
-					! game.getMe().getLocationGPS().equals(kodkod.getLocationGps())){
+					System.out.println(kodkod.getLocation());
+			//			System.out.println(game.getMe().getLocation()+"me");
+			//			System.out.println(path.get(i));
 
-				play.rotate((360-c.azimuth( game.getMe().getLocationGPS(),
-						kodkod.getLocationGps())-90)%360);
-			
+			//System.out.println(kodkod.getLocation());
+			//	System.out.println(path.get(i));
+			while(!getGraph().search(path.get(path.size()-1)).isDead() &&
+					!game.getMe().equal(kodkod)&&play.isRuning() ){
+				double a= (360-c.azimuth( kodkod.getLocationGps(),game.getMe().getLocationGPS()
+						)-90);
+				while(a<0) {
+					a=a+360;
+				}
+				p.add(a);
+				play.rotate(a);
+								System.out.println(a);
+				//				System.out.println(game.getMe().getLocation()+"me");
+
 				graph.getGame().readArrayList(play.getBoard());
-			
-				graph.reinsert();
 				
+				//System.out.println(graph.getGame().getMe().getLocation());
+
+
+				graph.reinsert();
+				//myThread t=new myThread(this.game, this.mf);
+				//t.start();
+				
+				mf.repaint();
+		
+				//				for(Kodkod p: graph.getGraph().get(0).getConnected()) {
+				//					System.out.println(p.getId()+"dsfsfs");
+				//				}
 			}
-			if(getGraph().search(path.get(path.size()-1))==null) {
-				algo();
+			
+			//System.out.println(i);
+			//System.out.println(graph.getGame().getMe().getLocationGPS());
+			if( getGraph().search(path.get(path.size()-1)).isDead()||!play.isRuning()) {
+				break;
 			}
+			
+			
 		}
+		algo();
 	}
 
 
 
 	public GpsPath computPath() {
 		double min=-1;
-		GpsPath path= new GpsPath();
+
+		
 		GpsPath minPath= new GpsPath();
 		for( Kodkod k :getGraph().getGraph() ) {
 			if(k.getWhoAmI()==2 && !k.isDead()) {
-				
-				path.getPath().clear();
-				path.setDis(0);
-				path.setDis(graph.bestPath(0,k.getId(), path).getDis());
-				if(path.getDis()<min || min==-1) {
-					System.out.println(1);
-					min=path.getDis();
-					minPath.getPath().clear();
-					for(Integer i : path.getPath()) {
-						minPath.getPath().add(i);
+
+				GpsPath path= new GpsPath();
+				graph.bestPath(0,k.getId(), path);
+				System.out.println( path.getPath()+"hhhh");
+				if(path.getPath().size()>0) {
+					if(path.getDis()<min || min==-1) {
+						System.out.println(k.getId());
+						min=path.getDis();
+						minPath.getPath().clear();
+						for(Integer i : path.getPath()) {
+							minPath.getPath().add(i);
+						}
+						minPath.setDis(path.getDis());
 					}
-					minPath.setDis(path.getDis());
 				}
 			}
 		}
-	return minPath;
+
+		return minPath;
 	}
-	
 
 
-	
+
+
 	public Game getGame() {
 		return game;
 	}
@@ -100,6 +148,8 @@ public class Algo {
 	public void setGame(Game game) {
 		this.game = game;
 	}
+
+	
 
 
 

@@ -30,12 +30,11 @@ public class Game {
 
 	////////////////////////////////constructors///////////////////////////////////////////////
 	/**
-	 * 
+	 *  * creates a game from a map
 	 * @param map
 	 */
 	public Game(Map map) {
 		this.map= map;
-
 	}
 	/**
 	 * creates a game from a csv file
@@ -53,9 +52,10 @@ public class Game {
 		readArrayList( s);
 	}
 
-
-	
 	///////////////////////////////////////////methods/////////////////////////////////////////////
+	/**
+	 * the function print the class
+	 */
 	public String toString() {
 		String ans="";
 		Iterator<Fruit> itFruits= getFruits().iterator();
@@ -121,15 +121,103 @@ public class Game {
 
 	}
 
+/**
+ * The function accepts a linked list of strings and reads it for create a game.
+ * @param s ArrayList of String
+ */
+
+	public void readArrayList(ArrayList<String> s) {
+		getFruits().removeAll(getFruits());
+		getPackmans().removeAll(getPackmans());
+		getGhosts().removeAll(getGhosts());
+		getBoxes().clear();
+
+		Iterator<String> it =s.iterator();
+		String line = "";
+		String title="Type,ID,Lat,Lon,Alt,Speed/Weight,Radius";
+		String cvsSplitBy = ",";
+		int column=0;
+		while(it.hasNext()) {
+			line= it.next();
+			String[] head= title.split(cvsSplitBy);
+			String[] userInfo= line.split(cvsSplitBy);
+
+
+			int isPackman= serch(userInfo,"P");
+			int isFruit= serch(userInfo, "F");
+			int isGhost= serch(userInfo, "G");
+			int isBox= serch(userInfo, "B");
+			int isPlayer=serch(userInfo,"M");
+
+			if(isPackman<userInfo.length) {
+				this.getPackmans().add(new Packman(userInfo,head,map));
+			}
+			if(isFruit<userInfo.length) {
+				this.getFruits().add(new Fruit(userInfo,head,map));
+			}
+			if(isGhost<userInfo.length) {
+				this.getGhosts().add(new Ghost(userInfo,head,map));
+			}
+			if(isBox<userInfo.length) {
+				this.getBoxes().add(new Box(userInfo,head,map));
+			}
+			if(me!=null) {
+				if(isPlayer<userInfo.length) {
+					me.setLocationGPS(new Gps_Point(head,userInfo));
+				}
+			}
+
+		}
+
+	}
+
+
+	/////////////////////////Getters and Setters//////////////////////////////////////////////////
+
+
+	public ArrayList<Ghost> getGhosts() {
+		return ghosts;
+	}
+
+	public ArrayList<Box> getBoxes() {
+		return boxes;
+	}
+
+
+	protected ArrayList<Fruit> getFruits() {
+		return fruits;
+	}
+	protected ArrayList<Packman> getPackmans() {
+		return packmans;
+	}
+
+	public Map getMap() {
+		return map;
+	}
+	public Player getMe() {
+		return me;
+	}
+	public void setMe(Player me) {
+		this.me = me;
+	}
+	///////////// private \\\\\\\\\\\\
+	private int serch(String[] head,String s) {
+		int index=head.length;
+		for (int i=0; i<head.length; i++) {
+			if(s.equals(head[i])||s.contentEquals(head[i])) {
+				index= i;
+				return index;
+			}
+		}
+
+
+		return index;
+	}
 
 	private Game read(String csvFile,int firstLine, Map map, Game game) {
-
 		String line = "";
 		String cvsSplitBy = ",";
 		int column=0;
-
-
-
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) 
 		{
 			int count =firstLine;
@@ -195,100 +283,6 @@ public class Game {
 		}
 		return game;
 	}
-
-	private int serch(String[] head,String s) {
-		int index=head.length;
-		for (int i=0; i<head.length; i++) {
-			if(s.equals(head[i])||s.contentEquals(head[i])) {
-				index= i;
-				return index;
-			}
-		}
-
-
-		return index;
-	}
-	public void readArrayList(ArrayList<String> s) {
-		getFruits().removeAll(getFruits());
-		getPackmans().removeAll(getPackmans());
-		getGhosts().removeAll(getGhosts());
-		getBoxes().clear();
-	
-		Iterator<String> it =s.iterator();
-		String line = "";
-		String title="Type,ID,Lat,Lon,Alt,Speed/Weight,Radius";
-		String cvsSplitBy = ",";
-		int column=0;
-		while(it.hasNext()) {
-			line= it.next();
-			String[] head= title.split(cvsSplitBy);
-			String[] userInfo= line.split(cvsSplitBy);
-
-
-			int isPackman= serch(userInfo,"P");
-			int isFruit= serch(userInfo, "F");
-			int isGhost= serch(userInfo, "G");
-			int isBox= serch(userInfo, "B");
-			int isPlayer=serch(userInfo,"M");
-
-			if(isPackman<userInfo.length) {
-				this.getPackmans().add(new Packman(userInfo,head,map));
-			}
-			if(isFruit<userInfo.length) {
-				this.getFruits().add(new Fruit(userInfo,head,map));
-			}
-			if(isGhost<userInfo.length) {
-				this.getGhosts().add(new Ghost(userInfo,head,map));
-			}
-			if(isBox<userInfo.length) {
-				this.getBoxes().add(new Box(userInfo,head,map));
-			}
-			if(me!=null) {
-				if(isPlayer<userInfo.length) {
-					me.setLocationGPS(new Gps_Point(head,userInfo));
-				}
-			}
-
-		}
-
-
-
-
-		
-	}
-
-
-	/////////////////////////Getters and Setters//////////////////////////////////////////////////
-
-
-	public ArrayList<Ghost> getGhosts() {
-		return ghosts;
-	}
-
-	public ArrayList<Box> getBoxes() {
-		return boxes;
-	}
-
-
-	protected ArrayList<Fruit> getFruits() {
-		return fruits;
-	}
-	protected ArrayList<Packman> getPackmans() {
-		return packmans;
-	}
-
-
-
-	public Map getMap() {
-		return map;
-	}
-	public Player getMe() {
-		return me;
-	}
-	public void setMe(Player me) {
-		this.me = me;
-	}
-
 
 
 

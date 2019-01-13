@@ -1,6 +1,10 @@
 package game;
 
-import java.io.File;
+/**
+ * This class represent a kodkod in the graph.
+ * @author ofra&shira
+ */
+
 import java.util.ArrayList;
 
 import Geom.Gps_Point;
@@ -18,7 +22,15 @@ public class Kodkod {
 	private boolean isVisited;
 	private boolean dead;
 
-
+///////////// constractor\\\\\\\\\\\\\
+	/**
+	 * Creates kodkod from GPS coordinates,a map,int whoAmI , int boazIdand an id.
+	 * @param p GPS coordinate
+	 * @param whoAmI 1-box, 2- fruit, 3- me, 4- packman
+	 * @param map
+	 * @param id
+	 * @param boazId
+	 */
 	public Kodkod( Gps_Point p,int whoAmI,Map map,int id,int boazId) {
 		setLocationGps(p);
 		setWhoAmI(whoAmI);
@@ -27,7 +39,7 @@ public class Kodkod {
 		setBoazId(boazId);
 	}
 
-
+///////////// Getters and Setters \\\\\\\\\\\\\
 	public Gps_Point getLocationGps() {
 		return locationGps;
 	}
@@ -43,9 +55,6 @@ public class Kodkod {
 	public void setConnected(ArrayList<Kodkod> connected) {
 		this.connected = connected;
 	}
-
-
-
 
 	public int getWhoAmI() {
 		return whoAmI;

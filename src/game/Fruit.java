@@ -20,7 +20,7 @@ public class Fruit implements GIS_element{
 	private Map map;
 	private FruitMetaData dataF;
 	
-	//////////////////constructor's////////////////////////////////////////////
+	//////////////////constructors////////////////////////////////////////////
 /**
  * Creates fruit from pixel coordinates,a map, and an id.  
  * @param x
@@ -35,8 +35,6 @@ public class Fruit implements GIS_element{
 		setLocationGPS(new Gps_Point(map.convertePixelToGps((new Pixel(x, y)))));
 
 	}
-
-
 /**
  * creates a fruit from arrays of String's.
  * need's in to create a game from a CSV file.
@@ -51,9 +49,6 @@ public class Fruit implements GIS_element{
 	
 
 		this.dataF= new FruitMetaData(head,line);
-
-
-
 	}
 
 	/**
@@ -63,7 +58,6 @@ public class Fruit implements GIS_element{
 	public Fruit(Fruit f) {
 		setLocationGPS(new Gps_Point(f.getLocationGPS()));
 		this.map= f.map;
-		
 		this.dataF= new FruitMetaData(f.dataF);
 	}
 

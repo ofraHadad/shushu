@@ -32,17 +32,22 @@ public class Graph {
 		for(Fruit i : game.getFruits()) {
 			graph.add(new Kodkod(i.getLocationGPS(),2,game.getMap(),id++,i.getDataF().getId()));
 		}
-		for(Packman i: game.getPackmans()) {
-			graph.add(new Kodkod(i.getLocationGPS(),4,game.getMap(),id++,i.getDataP().getId()));
-		}
+//		for(Packman i: game.getPackmans()) {
+//			graph.add(new Kodkod(i.getLocationGPS(),4,game.getMap(),id++,i.getDataP().getId()));
+//		}
 
+		conected();
+	}
+
+	private void conected() {
 		Iterator<Kodkod> boxesI=graph.iterator();
 		int count=0;
 		while(boxesI.hasNext()) {
 			Kodkod i= boxesI.next();
-			if(i.getWhoAmI()==2) {
-				return;
-			}
+			//i.getConnected().clear();		
+//			if(i.getWhoAmI()==2) {
+//				return;
+//			}
 			Iterator<Kodkod> boxesJ= graph.iterator();
 			for(int k=-1 ; k<count; k++) {
 				boxesJ.next();
@@ -50,9 +55,8 @@ public class Graph {
 			while(boxesJ.hasNext()) {
 				Kodkod j= boxesJ.next();
 
-				if(isLegal(i.getLocation(), j.getLocation())) {
+				if(isLegal(i.getLocation(), j.getLocation())&&!j.isDead()) {
 					i.getConnected().add(j);
-
 					j.getConnected().add(i);
 
 				}
@@ -62,9 +66,11 @@ public class Graph {
 			count++;
 		}
 	}
+	
 	public void reinsert() {
 
 		for(Kodkod k: getGraph()) {
+
 			if(k.getWhoAmI()==2) {
 				k.setDead(true);
 				for(Fruit f: getGame().getFruits()) {
@@ -73,23 +79,37 @@ public class Graph {
 						break;
 					}
 				}	
-				
 			}
 			if(k.getWhoAmI()==3) {
-				k.setLocationGps(game.getMe().getLocationGPS());
+				k.setLocationGps(game.getMe().getLocationGPS());	
+				
 			}
-			if(k.getWhoAmI()==4) {
+//			if(k.getWhoAmI()==4) {
+//
+//				for(Packman p: game.getPackmans()) {
+//					if(k.getBoazId()==p.getDataP().getId()) {
+//						k.setLocationGps(p.getLocationGPS());
+//						break;
+//					}
+//				}
+		//	}
 
-				for(Packman p: game.getPackmans()) {
-					if(k.getBoazId()==p.getDataP().getId()) {
-						k.setLocationGps(p.getLocationGPS());
-						break;
-					}
-				}
-
-
-			}
 		}
+		Iterator<Kodkod> boxesJ= graph.iterator();
+		Kodkod k= graph.get(0);
+		k.getConnected().clear();
+				boxesJ.next();
+			
+			while(boxesJ.hasNext()) {
+				Kodkod j= boxesJ.next();
+
+				if(isLegal(k.getLocation(), j.getLocation())&&!j.isDead()) {
+					k.getConnected().add(j);
+					j.getConnected().add(k);
+
+				}
+			}
+	
 	}
 	/**
 	 * we used the code from: https://www.geeksforgeeks.org/find-paths-given-source-destination/
@@ -98,8 +118,9 @@ public class Graph {
 	 * @param minPathList
 	 * @return
 	 */
-	public GpsPath bestPath(int s, int d, GpsPath minPathList) 
+	public void bestPath(int s, int d, GpsPath minPathList) 
 	{ 
+		
 		GpsPath pathList= new GpsPath();
 		//add source to path[] 
 		pathList.getPath().add(s); 
@@ -110,7 +131,7 @@ public class Graph {
 		for(Kodkod k: graph) {
 			k.setVisited(false);
 		}
-		return minPathList;
+		return;
 	} 
 
 

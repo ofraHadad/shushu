@@ -101,9 +101,9 @@ public class Gps_Point implements Geom_element   {
 		Point3D diffMeter=ConvertsDegreesToMeters(diff,LonNorm);
 		double distanceXY=Math.sqrt((Math.pow(diffMeter.x(), 2))+(Math.pow(diffMeter.y(),2)));
 		double diffZ= gps1.get_z()-get_z();
-		if(Math.sqrt((Math.pow(distanceXY, 2))+(Math.pow(diffZ,2)))>100000) {
-			throw new RuntimeException("over 100 km");
-		}
+		//if(Math.sqrt((Math.pow(distanceXY, 2))+(Math.pow(diffZ,2)))>100000) {
+		//	throw new RuntimeException("over 100 km");
+		//}
 
 		return Math.sqrt((Math.pow(distanceXY, 2))+(Math.pow(diffZ,2)));
 	}
